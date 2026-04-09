@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>妹妹打掃打卡系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --cream:#FAF6EF; --warm:#F5EDD8; --brown:#5C3D2E; --terra:#C4622D;
+  --sage:#7A9E7E; --gold:#D4A843; --dark:#2E1A0E;
+  --ls:#EAF2EB; --lr:#F9EDEC; --lg:#FDF5E0;
+}
+body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var(--dark); min-height:100vh; }
+.app { max-width:660px; margin:0 auto; padding:24px 16px 60px; }
+
+/* HEADER */
+.header { text-align:center; margin-bottom:22px; }
+.header::after { content:''; display:block; height:2px; background:linear-gradient(to right,transparent,var(--gold),transparent); margin-top:10px; }
+.header h1 { font-family:'Noto Serif TC',serif; font-size:26px; font-weight:900; color:var(--brown); letter-spacing:4px; }
+.header p { font-size:11px; color:var(--sage); letter-spacing:3px; margin-top:4px; }
+
+/* TABS */
+.tabs { display:flex; gap:4px; margin-bottom:18px; background:var(--warm); border-radius:12px; padding:4px; }
+.tab { flex:1; padding:9px 4px; text-align:center; border:none; background:transparent; border-radius:9px; font-family:'Noto Sans TC',sans-serif; font-size:12px; color:var(--brown); cursor:pointer; font-weight:500; transition:all 0.2s; }
+.tab.active { background:white; color:var(--terra); font-weight:700; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+
+/* PAGE */
+.page { display:none; }
+.page.active { display:block; }
+
+/* TOP SUMMARY BAR */
+.summary-bar { background:var(--brown); border-radius:16px; padding:18px 20px; display:grid; grid-template-columns:1fr 1px 1fr 1px 1fr; gap:0; margin-bottom:16px; align-items:center; }
+.sb-divider { background:rgba(255,255,255,0.1); height:36px; }
+.sb-item { text-align:center; padding:0 8px; }
+.sb-label { font-size:9px; letter-spacing:2px; color:var(--gold); font-weight:700; margin-bottom:5px; }
+.sb-value { font-family:'Noto Serif TC',serif; font-size:22px; font-weight:900; color:white; line-height:1; }
+.sb-sub { font-size:9px; color:rgba(255,255,255,0.4); margin-top:3px; }
+
+/* NEXT ZONE CARD */
+.next-zone-card { border-radius:16px; padding:18px 20px; margin-bottom:16px; background:var(--lg); border:2px solid var(--gold); }
+.nz-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.nz-label { font-size:10px; letter-spacing:2px; color:var(--sage); font-weight:700; }
+.nz-badge { margin-left:auto; background:var(--terra); color:white; border-radius:20px; padding:3px 12px; font-size:11px; font-weight:700; }
+.nz-zone { font-family:'Noto Serif TC',serif; font-size:42px; font-weight:900; color:var(--terra); line-height:1; margin-right:12px; }
+.nz-info { flex:1; }
+.nz-name { font-size:15px; font-weight:700; color:var(--brown); }
+.nz-desc { font-size:12px; color:var(--sage); margin-top:3px; }
+.nz-body { display:flex; align-items:center; }
+
+/* ZONE PIPELINE */
+.pipeline { display:flex; gap:4px; align-items:center; overflow-x:auto; padding-bottom:2px; margin-bottom:16px; }
+.pipeline::-webkit-scrollbar { display:none; }
+.pl-zone { flex-shrink:0; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Noto Serif TC',serif; font-size:14px; font-weight:900; border:2px solid var(--warm); color:var(--warm); transition:all 0.3s; }
+.pl-zone.done { background:var(--sage); border-color:var(--sage); color:white; }
+.pl-zone.current { background:var(--terra); border-color:var(--terra); color:white; box-shadow:0 0 0 3px rgba(196,98,45,0.2); }
+.pl-arrow { color:var(--warm); font-size:12px; flex-shrink:0; }
+
+/* CARD */
+.card { background:white; border-radius:16px; padding:20px; margin-bottom:16px; border:1.5px solid var(--warm); }
+.card-title { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.card-dot { width:8px; height:8px; border-radius:50%; background:var(--terra); flex-shrink:0; }
+.card-title h2 { font-family:'Noto Serif TC',serif; font-size:15px; font-weight:700; color:var(--brown); letter-spacing:2px; }
+.card-right { margin-left:auto; font-size:11px; color:var(--sage); }
+
+/* FORM */
+.form-row { margin-bottom:14px; }
+.form-label { font-size:11px; color:var(--sage); font-weight:700; letter-spacing:1px; margin-bottom:6px; display:block; }
+.form-input { width:100%; padding:11px 14px; border:1.5px solid var(--warm); border-radius:10px; font-family:'Noto Sans TC',sans-serif; font-size:14px; color:var(--dark); background:var(--cream); outline:none; transition:border-color 0.2s; }
+.form-input:focus { border-color:var(--gold); }
+
+.hours-row { display:flex; gap:6px; flex-wrap:wrap; }
+.hour-btn { padding:8px 13px; border:1.5px solid var(--warm); border-radius:8px; background:white; font-size:13px; color:var(--brown); cursor:pointer; font-family:'Noto Sans TC',sans-serif; transition:all 0.2s; }
+.hour-btn:hover { border-color:var(--gold); background:var(--lg); }
+.hour-btn.selected { background:var(--terra); border-color:var(--terra); color:white; }
+.custom-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.custom-row input { width:90px; text-align:center; }
+
+.submit-btn { width:100%; padding:14px; background:var(--terra); border:none; border-radius:12px; color:white; font-family:'Noto Serif TC',serif; font-size:16px; font-weight:700; letter-spacing:3px; cursor:pointer; transition:all 0.2s; }
+.submit-btn:hover { background:var(--brown); transform:translateY(-1px); }
+.submit-btn:disabled { background:var(--warm); color:var(--brown); opacity:0.5; cursor:not-allowed; transform:none; }
+
+/* HISTORY ENTRY */
+.entry-item { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--warm); }
+.entry-item:last-child { border-bottom:none; }
+.entry-zone { width:40px; height:40px; border-radius:10px; background:var(--lg); display:flex; align-items:center; justify-content:center; font-family:'Noto Serif TC',serif; font-size:18px; font-weight:900; color:var(--terra); flex-shrink:0; }
+.entry-info { flex:1; min-width:0; }
+.entry-name { font-size:13px; font-weight:600; color:var(--brown); }
+.entry-date { font-size:11px; color:var(--sage); margin-top:2px; }
+.entry-right { text-align:right; flex-shrink:0; }
+.entry-hours { font-family:'Noto Serif TC',serif; font-size:16px; font-weight:700; color:var(--brown); }
+.entry-hours span { font-size:10px; color:var(--sage); }
+.entry-bank { font-size:10px; margin-top:2px; }
+.entry-bank.pos { color:var(--sage); }
+.entry-bank.neg { color:var(--terra); }
+.delete-btn { background:none; border:none; color:var(--warm); cursor:pointer; font-size:15px; padding:4px; transition:color 0.2s; flex-shrink:0; }
+.delete-btn:hover { color:var(--terra); }
+.history-empty { text-align:center; padding:28px; color:var(--sage); font-size:13px; opacity:0.7; }
+
+/* BANK PAGE */
+.bank-hero { background:linear-gradient(135deg,var(--brown),#3d2518); border-radius:18px; padding:24px; margin-bottom:16px; text-align:center; }
+.bh-label { font-size:10px; letter-spacing:3px; color:var(--gold); font-weight:700; margin-bottom:8px; }
+.bh-value { font-family:'Noto Serif TC',serif; font-size:52px; font-weight:900; color:white; line-height:1; }
+.bh-unit { font-size:14px; color:rgba(255,255,255,0.5); margin-top:4px; }
+.bh-note { margin-top:12px; font-size:12px; color:rgba(255,255,255,0.5); }
+
+.month-list { display:flex; flex-direction:column; gap:10px; }
+.month-item { background:white; border-radius:12px; padding:14px 16px; border:1.5px solid var(--warm); display:flex; align-items:center; gap:12px; }
+.mi-month { font-family:'Noto Serif TC',serif; font-size:15px; font-weight:700; color:var(--brown); min-width:52px; }
+.mi-info { flex:1; }
+.mi-zones { font-size:12px; color:var(--sage); }
+.mi-bank { font-size:13px; font-weight:600; margin-top:2px; }
+.mi-bank.pos { color:var(--sage); }
+.mi-bank.neg { color:var(--terra); }
+.mi-settled { font-size:10px; background:var(--ls); color:var(--sage); border-radius:20px; padding:2px 10px; font-weight:700; }
+
+/* VACATION */
+.vacation-box { background:var(--ls); border-radius:14px; padding:18px 20px; margin-bottom:16px; border:1.5px solid var(--sage); display:flex; align-items:center; gap:16px; }
+.vb-icon { font-size:32px; flex-shrink:0; }
+.vb-label { font-size:10px; letter-spacing:2px; color:var(--sage); font-weight:700; margin-bottom:4px; }
+.vb-value { font-family:'Noto Serif TC',serif; font-size:28px; font-weight:900; color:var(--brown); line-height:1; }
+.vb-sub { font-size:11px; color:var(--sage); margin-top:3px; }
+
+.use-vacation-row { display:flex; gap:8px; }
+.use-vacation-row input { flex:1; }
+.use-btn { padding:11px 18px; background:var(--terra); border:none; border-radius:10px; color:white; font-family:'Noto Serif TC',serif; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+.use-btn:hover { background:var(--brown); }
+
+.vacation-log { margin-top:12px; }
+.vl-item { padding:10px 0; border-bottom:1px solid var(--warm); display:flex; align-items:center; gap:10px; font-size:12px; }
+.vl-item:last-child { border-bottom:none; }
+.vl-date { color:var(--sage); min-width:60px; }
+.vl-desc { flex:1; color:var(--brown); }
+.vl-hours { font-weight:700; color:var(--terra); }
+
+/* RULES PAGE */
+.section { margin-bottom:22px; }
+.section-title { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.section-title .dot { width:9px; height:9px; border-radius:50%; background:var(--terra); flex-shrink:0; }
+.section-title .line { flex:1; height:1px; background:linear-gradient(to right,var(--gold),transparent); }
+.zones-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.zone-card { border-radius:12px; padding:12px 10px; position:relative; overflow:hidden; }
+.zone-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; }
+.zone-A{background:var(--lg);} .zone-A::before{background:var(--gold);}
+.zone-B{background:var(--lr);} .zone-B::before{background:#C9847A;}
+.zone-C{background:var(--ls);} .zone-C::before{background:var(--sage);}
+.zone-D{background:var(--lr);} .zone-D::before{background:#C9847A;}
+.zone-E{background:var(--lg);} .zone-E::before{background:var(--gold);}
+.zone-F{background:var(--lr);} .zone-F::before{background:#C9847A;}
+.zone-G{background:var(--ls);} .zone-G::before{background:var(--sage);}
+.zone-H{background:#FFF0EA;} .zone-H::before{background:var(--terra);}
+.zone-num { font-size:9px; color:var(--sage); font-weight:700; letter-spacing:1px; margin-bottom:2px; }
+.zone-letter { font-family:'Noto Serif TC',serif; font-size:20px; font-weight:900; color:var(--brown); margin-bottom:2px; }
+.zone-name { font-size:10px; font-weight:700; color:var(--terra); letter-spacing:1px; margin-bottom:3px; }
+.zone-desc { font-size:10px; color:var(--brown); line-height:1.5; opacity:0.85; }
+.rules-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rule-card { background:white; border-radius:12px; padding:13px 16px; border-left:4px solid var(--gold); display:flex; gap:10px; align-items:flex-start; }
+.rule-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+.rule-label { font-size:10px; letter-spacing:2px; color:var(--sage); font-weight:700; margin-bottom:3px; }
+.rule-value { font-size:12px; color:var(--dark); font-weight:500; line-height:1.6; }
+.rule-value strong { color:var(--terra); }
+.weekly-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.weekly-card { border-radius:12px; padding:14px; text-align:center; background:white; border:1.5px solid var(--warm); }
+.weekly-card.highlight { background:var(--lg); border-color:var(--gold); }
+.weekly-day { font-size:10px; letter-spacing:2px; color:var(--sage); font-weight:700; margin-bottom:6px; }
+.weekly-icon { font-size:24px; margin-bottom:4px; }
+.weekly-task { font-size:11px; font-weight:600; color:var(--brown); line-height:1.5; }
+.bank-box { background:linear-gradient(135deg,var(--ls),var(--lg)); border-radius:14px; padding:18px 20px; border:1.5px solid var(--sage); }
+.bank-title { font-family:'Noto Serif TC',serif; font-size:13px; font-weight:700; color:var(--brown); margin-bottom:10px; }
+.bank-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.bank-item { background:white; border-radius:10px; padding:11px 13px; }
+.bi-label { font-size:10px; color:var(--sage); font-weight:700; letter-spacing:1px; margin-bottom:3px; }
+.bi-value { font-size:12px; color:var(--brown); line-height:1.6; }
+.bi-value strong { color:var(--terra); }
+.leave-box { background:linear-gradient(135deg,var(--ls),var(--lg)); border-radius:14px; padding:18px 20px; display:flex; align-items:center; gap:16px; border:1.5px solid var(--sage); }
+.leave-icon { font-size:32px; flex-shrink:0; }
+.leave-title { font-family:'Noto Serif TC',serif; font-size:13px; font-weight:700; color:var(--brown); margin-bottom:4px; }
+.leave-desc { font-size:11px; color:var(--dark); line-height:1.8; }
+.leave-desc strong { color:var(--terra); }
+.salary-box { background:var(--brown); border-radius:14px; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.salary-label { font-size:10px; letter-spacing:3px; color:var(--gold); font-weight:700; margin-bottom:4px; }
+.salary-amount { font-family:'Noto Serif TC',serif; font-size:32px; font-weight:900; color:var(--gold); line-height:1; }
+.salary-unit { font-size:12px; color:rgba(255,255,255,0.5); margin-top:4px; }
+.salary-note { background:rgba(255,255,255,0.1); border-radius:10px; padding:12px 18px; text-align:center; }
+.salary-note-label { font-size:10px; color:var(--gold); letter-spacing:2px; margin-bottom:4px; }
+.salary-note-value { font-family:'Noto Serif TC',serif; font-size:20px; font-weight:700; color:white; }
+.salary-note-sub { font-size:10px; color:rgba(255,255,255,0.45); margin-top:3px; }
+.or-icon { font-size:26px; flex-shrink:0; }
+.or-title { font-family:'Noto Serif TC',serif; font-size:13px; font-weight:700; color:var(--brown); margin-bottom:4px; }
+.or-desc { font-size:11px; color:var(--dark); line-height:1.7; }
+.or-desc strong { color:var(--terra); }
+.order-rule { background:white; border-radius:14px; padding:14px 18px; border:2px solid var(--gold); display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+.arrow-flow { display:flex; align-items:center; gap:3px; flex-wrap:wrap; margin-top:6px; }
+.af-zone { background:var(--terra); color:white; border-radius:6px; padding:2px 7px; font-family:'Noto Serif TC',serif; font-size:12px; font-weight:900; }
+.af-arr { color:var(--gold); font-size:11px; }
+.rules-footer { text-align:center; margin-top:20px; padding-top:12px; border-top:1px dashed var(--warm); font-size:11px; color:var(--sage); letter-spacing:2px; line-height:2; }
+
+/* TOAST */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--brown); color:white; padding:12px 24px; border-radius:30px; font-size:13px; opacity:0; transition:all 0.3s; pointer-events:none; z-index:999; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <h1>打掃打卡系統</h1>
+    <p>妹妹專屬 · 每日記錄</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('checkin')">📋 打卡</button>
+    <button class="tab" onclick="switchTab('history')">📅 紀錄</button>
+    <button class="tab" onclick="switchTab('bank')">🏦 時間銀行</button>
+    <button class="tab" onclick="switchTab('overview')">👀 家人總覽</button>
+    <button class="tab" onclick="switchTab('rules')">📖 制度</button>
+  </div>
+
+  <!-- ===== TAB: CHECKIN ===== -->
+  <div class="page active" id="page-checkin">
+
+    <div class="summary-bar">
+      <div class="sb-item">
+        <div class="sb-label">本週完成</div>
+        <div class="sb-value" id="sb-zones">0<span style="font-size:13px;color:rgba(255,255,255,0.35)">/5</span></div>
+        <div class="sb-sub">個區域</div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">
+        <div class="sb-label">特休餘額</div>
+        <div class="sb-value" id="sb-bank">0<span style="font-size:12px;color:rgba(255,255,255,0.35)">次</span></div>
+        <div class="sb-sub" id="sb-bank-sub">免費+銀行可換</div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">
+        <div class="sb-label">本週薪資</div>
+        <div class="sb-value" id="sb-pay" style="color:var(--gold);">$0</div>
+        <div class="sb-sub" id="sb-pay-sub">目標 $2,500</div>
+      </div>
+    </div>
+
+    <!-- NEXT ZONE -->
+    <div class="next-zone-card">
+      <div class="nz-top">
+        <span class="nz-label">下一個區域</span>
+        <span class="nz-badge" id="nz-badge">待完成</span>
+      </div>
+      <div class="nz-body">
+        <div class="nz-zone" id="nz-letter">A</div>
+        <div class="nz-info">
+          <div class="nz-name" id="nz-name">1樓公共區域</div>
+          <div class="nz-desc" id="nz-desc">標準時間 2 小時</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK VACATION -->
+    <button onclick="quickVacationToday()" style="width:100%;padding:13px;background:var(--ls);border:1.5px solid var(--sage);border-radius:12px;color:var(--brown);font-family:'Noto Serif TC',serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all 0.2s;margin-bottom:16px;" id="quick-vacation-btn">🏖️ 今天請假</button>
+
+    <!-- PIPELINE -->
+    <div class="card" style="padding:14px 16px;">
+      <div style="font-size:10px;letter-spacing:2px;color:var(--sage);font-weight:700;margin-bottom:10px;">本輪進度</div>
+      <div class="pipeline" id="pipeline"></div>
+    </div>
+
+    <!-- CHECKIN FORM -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-dot"></div>
+        <h2>今日打卡</h2>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">📅 日期</label>
+        <input type="date" class="form-input" id="input-date">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">🏠 打卡區域</label>
+        <div style="padding:12px 14px;background:var(--lg);border-radius:10px;border:1.5px solid var(--gold);font-size:14px;color:var(--brown);font-weight:600;" id="locked-zone-display">
+          — 載入中 —
+        </div>
+        <div style="font-size:11px;color:var(--sage);margin-top:6px;">區域依順序執行，完成後自動更新至下一區</div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">⏱️ 花費時間（小時）</label>
+        <div class="hours-row" id="hours-btns">
+          <button class="hour-btn" onclick="selectHour(0.5)">0.5</button>
+          <button class="hour-btn" onclick="selectHour(1)">1</button>
+          <button class="hour-btn" onclick="selectHour(1.5)">1.5</button>
+          <button class="hour-btn" onclick="selectHour(2)">2</button>
+          <button class="hour-btn" onclick="selectHour(2.5)">2.5</button>
+          <button class="hour-btn" onclick="selectHour(3)">3</button>
+        </div>
+        <div class="custom-row">
+          <span style="font-size:12px;color:var(--sage);">自訂：</span>
+          <input type="number" class="form-input" id="input-hours" placeholder="例：1.5" min="0.5" max="8" step="0.5" style="width:90px;" oninput="clearHourBtns()">
+          <span style="font-size:12px;color:var(--sage);">小時</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">📝 備註（選填）</label>
+        <input type="text" class="form-input" id="input-note" placeholder="例：順便擦了牆壁">
+      </div>
+
+      <button class="submit-btn" onclick="submitEntry()" id="submit-btn">✓ 完成打卡</button>
+    </div>
+  </div>
+
+  <!-- ===== TAB: HISTORY ===== -->
+  <div class="page" id="page-history">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-dot"></div>
+        <h2>打卡紀錄</h2>
+        <span class="card-right" id="history-count"></span>
+      </div>
+      <div id="history-list"><div class="history-empty">還沒有紀錄，去打第一張卡吧！🌱</div></div>
+    </div>
+  </div>
+
+  <!-- ===== TAB: BANK ===== -->
+  <div class="page" id="page-bank">
+
+    <div class="bank-hero">
+      <div class="bh-label">目前時間存款</div>
+      <div class="bh-value" id="bh-total">0</div>
+      <div class="bh-unit">小時（每 2hr = 1 次特休）</div>
+      <div class="bh-note">累積滿 2hr 隨時可兌換，跨月持續計算</div>
+    </div>
+
+    <!-- VACATION STATUS -->
+    <div class="vacation-box">
+      <div class="vb-icon">🏖️</div>
+      <div style="flex:1;">
+        <div class="vb-label">可用特休</div>
+        <div class="vb-value" id="vb-balance">0 <span style="font-size:16px;font-weight:400;">次</span></div>
+        <div class="vb-sub" id="vb-free">本月免費剩 3 次 ＋ 銀行可換 0 次</div>
+      </div>
+    </div>
+
+    <!-- USE VACATION -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-dot"></div>
+        <h2>申請特休</h2>
+      </div>
+      <div style="font-size:12px;color:var(--sage);margin-bottom:12px;">每月 <strong style="color:var(--terra);">3 次免費</strong>，用完自動從時間銀行扣（每 2hr = 1 次）</div>
+      <div class="form-row">
+        <label class="form-label">📅 請假日期</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="date" class="form-input" id="vacation-start" style="flex:1;">
+          <span style="font-size:12px;color:var(--sage);">到</span>
+          <input type="date" class="form-input" id="vacation-end" style="flex:1;">
+        </div>
+        <div style="font-size:11px;color:var(--sage);margin-top:6px;">只填開始 = 請 1 天；填起迄 = 連續請假，自動分配到對應週</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">申請原因（選填）</label>
+        <input type="text" class="form-input" id="vacation-reason" placeholder="例：身體不舒服、旅遊">
+      </div>
+      <div id="vacation-preview" style="font-size:12px;color:var(--brown);margin-bottom:12px;display:none;"></div>
+      <button class="use-btn" style="width:100%;padding:12px;" onclick="useVacation()">申請特休</button>
+      <div class="vacation-log" id="vacation-log"></div>
+    </div>
+
+    <!-- MONTHLY BREAKDOWN -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-dot"></div>
+        <h2>每月明細</h2>
+      </div>
+      <div class="month-list" id="month-list">
+        <div class="history-empty">還沒有紀錄</div>
+      </div>
+    </div>
+
+    <!-- DATA MANAGEMENT -->
+    <div class="card" style="border-color:var(--warm);">
+      <div class="card-title">
+        <div class="card-dot" style="background:var(--sage);"></div>
+        <h2>資料管理</h2>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button onclick="exportBackup()" style="width:100%;padding:11px;background:var(--sage);border:none;border-radius:10px;color:white;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">💾 匯出備份</button>
+        <button onclick="importBackup()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--sage);border-radius:10px;color:var(--sage);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📂 匯入還原</button>
+        <button onclick="archiveOld()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--gold);border-radius:10px;color:var(--brown);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📦 歸檔舊資料（保留近 2 月）</button>
+        <button onclick="resetAll()" style="width:100%;padding:11px;background:none;border:1.5px solid #ddd;border-radius:10px;color:#bbb;font-family:'Noto Sans TC',sans-serif;font-size:11px;cursor:pointer;">🗑️ 清空全部資料</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB: OVERVIEW ===== -->
+  <div class="page" id="page-overview">
+
+    <!-- OVERALL STATS -->
+    <div class="summary-bar" style="grid-template-columns:1fr 1px 1fr 1px 1fr 1px 1fr;">
+      <div class="sb-item">
+        <div class="sb-label">總完成</div>
+        <div class="sb-value" id="ov-total">0<span style="font-size:12px;color:rgba(255,255,255,0.35)">區</span></div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">
+        <div class="sb-label">達標率</div>
+        <div class="sb-value" id="ov-rate">—</div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">
+        <div class="sb-label">連勝</div>
+        <div class="sb-value" id="ov-streak">0<span style="font-size:12px;color:rgba(255,255,255,0.35)">週</span></div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">
+        <div class="sb-label">未繳罰款</div>
+        <div class="sb-value" id="ov-unpaid" style="color:#ffaa80;">$0</div>
+      </div>
+    </div>
+
+    <!-- UNPAID PENALTIES -->
+    <div class="card" id="ov-unpaid-card" style="display:none;">
+      <div class="card-title">
+        <div class="card-dot" style="background:#C9847A;"></div>
+        <h2>未繳罰款</h2>
+      </div>
+      <div id="ov-unpaid-list"></div>
+    </div>
+
+    <!-- WEEKLY STATUS -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-dot"></div>
+        <h2>每週狀態</h2>
+        <span class="card-right" id="ov-week-count"></span>
+      </div>
+      <div id="ov-weeks"></div>
+    </div>
+
+    <!-- VACATION USAGE -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-dot"></div>
+        <h2>特休使用紀錄</h2>
+      </div>
+      <div id="ov-vacation"></div>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB: RULES ===== -->
+  <div class="page" id="page-rules">
+
+    <div class="order-rule">
+      <div class="or-icon">🔒</div>
+      <div>
+        <div class="or-title">必須按照順序執行</div>
+        <div class="or-desc">區域依序完成，<strong>不能跳過</strong>。做完 H 後重新從 A 開始循環。</div>
+        <div class="arrow-flow">
+          <span class="af-zone">A</span><span class="af-arr">›</span>
+          <span class="af-zone">B</span><span class="af-arr">›</span>
+          <span class="af-zone">C</span><span class="af-arr">›</span>
+          <span class="af-zone">D</span><span class="af-arr">›</span>
+          <span class="af-zone">E</span><span class="af-arr">›</span>
+          <span class="af-zone">F</span><span class="af-arr">›</span>
+          <span class="af-zone">G</span><span class="af-arr">›</span>
+          <span class="af-zone">H</span><span class="af-arr">›</span>
+          <span style="font-size:10px;color:var(--sage);">循環</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="dot"></div><h2>八大打掃區域</h2><div class="line"></div></div>
+      <div class="zones-grid">
+        <div class="zone-card zone-A"><div class="zone-num">第 1 區</div><div class="zone-letter">A</div><div class="zone-name">一樓公共</div><div class="zone-desc">1樓公共區域</div></div>
+        <div class="zone-card zone-B"><div class="zone-num">第 2 區</div><div class="zone-letter">B</div><div class="zone-name">一樓廁所</div><div class="zone-desc">1樓廁所</div></div>
+        <div class="zone-card zone-C"><div class="zone-num">第 3 區</div><div class="zone-letter">C</div><div class="zone-name">二樓公共＋媽媽房</div><div class="zone-desc">含曬衣區地板＋媽媽房間</div></div>
+        <div class="zone-card zone-D"><div class="zone-num">第 4 區</div><div class="zone-letter">D</div><div class="zone-name">二樓廁所</div><div class="zone-desc">2樓廁所</div></div>
+        <div class="zone-card zone-E"><div class="zone-num">第 5 區</div><div class="zone-letter">E</div><div class="zone-name">三樓公共＋臥房</div><div class="zone-desc">公共＋自己房＋爸爸房</div></div>
+        <div class="zone-card zone-F"><div class="zone-num">第 6 區</div><div class="zone-letter">F</div><div class="zone-name">三樓廁所</div><div class="zone-desc">3樓廁所</div></div>
+        <div class="zone-card zone-G"><div class="zone-num">第 7 區</div><div class="zone-letter">G</div><div class="zone-name">四樓陽台＋鳥房</div><div class="zone-desc">地板清水刷洗＋鳥房間</div></div>
+        <div class="zone-card zone-H"><div class="zone-num">第 8 區</div><div class="zone-letter">H</div><div class="zone-name">廚房</div><div class="zone-desc">整體廚房清潔</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="dot"></div><h2>執行規則</h2><div class="line"></div></div>
+      <div class="rules-grid">
+        <div class="rule-card"><div class="rule-icon">📋</div><div><div class="rule-label">順序執行</div><div class="rule-value">依 <strong>A→H 順序</strong>逐區完成，進度跨週延續</div></div></div>
+        <div class="rule-card"><div class="rule-icon">⏱️</div><div><div class="rule-label">週目標</div><div class="rule-value">每週完成 <strong>5 個區域</strong>，每區標準 <strong>2 小時</strong></div></div></div>
+        <div class="rule-card"><div class="rule-icon">🙋</div><div><div class="rule-label">機動協助</div><div class="rule-value"><strong>主動詢問</strong>媽媽需要什麼幫忙</div></div></div>
+        <div class="rule-card"><div class="rule-icon">🔁</div><div><div class="rule-label">循環制</div><div class="rule-value">做完 H 後重新從 <strong>A 開始</strong></div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="dot"></div><h2>每日 / 每週固定任務</h2><div class="line"></div></div>
+      <div class="rules-grid">
+        <div class="rule-card"><div class="rule-icon">🍽️</div><div><div class="rule-label">每天晚上</div><div class="rule-value">收拾廚房食物、<strong>洗碗</strong></div></div></div>
+        <div class="rule-card"><div class="rule-icon">🗑️</div><div><div class="rule-label">每週至少 2 次</div><div class="rule-value">固定<strong>倒垃圾＋回收</strong></div></div></div>
+        <div class="rule-card"><div class="rule-icon">🚗</div><div><div class="rule-label">每月至少 2 次</div><div class="rule-value">開車載水桶去<strong>加水</strong></div></div></div>
+      </div>
+      <div class="weekly-grid" style="margin-top:10px;">
+        <div class="weekly-card highlight"><div class="weekly-day">每週三</div><div class="weekly-icon">🍳</div><div class="weekly-task">協助煮飯</div></div>
+        <div class="weekly-card highlight"><div class="weekly-day">每週日</div><div class="weekly-icon">🍳</div><div class="weekly-task">協助煮飯</div></div>
+        <div class="weekly-card"><div class="weekly-day">每週日</div><div class="weekly-icon">🐦</div><div class="weekly-task">固定餵鳥</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="dot"></div><h2>未達標罰款</h2><div class="line"></div></div>
+      <div class="order-rule" style="border-color:#C9847A;background:var(--lr);">
+        <div class="or-icon">⚠️</div>
+        <div>
+          <div class="or-title" style="color:var(--terra);">未完成當週目標，需繳費給媽媽</div>
+          <div class="or-desc">每少完成 1 區 → 繳交 <strong>500 元</strong><br>例：目標 5 區，完成 3 區 → 繳 <strong>$1,000</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="dot"></div><h2>時間銀行制度</h2><div class="line"></div></div>
+      <div class="bank-box">
+        <div class="bank-title">🏦 累積滿 2 小時，隨時可兌換特休</div>
+        <div class="bank-grid">
+          <div class="bank-item"><div class="bi-label">如何累積</div><div class="bi-value">每區標準 2hr，<strong>超過才存款</strong><br>花 1–2hr → <strong>不存不扣</strong><br>花 2.5hr → 存入 <strong>+0.5hr</strong></div></div>
+          <div class="bank-item"><div class="bi-label">如何兌換</div><div class="bi-value">累積滿 <strong>+2hr</strong>，<strong>隨時可申請</strong>兌換成特休</div></div>
+          <div class="bank-item"><div class="bi-label">兌換效益</div><div class="bi-value">每 +2hr → 當週目標 -1 區，只需完成 <strong>4 區</strong></div></div>
+          <div class="bank-item"><div class="bi-label">特休用途</div><div class="bi-value">不舒服、旅遊均可動用，<strong>跨月不消失</strong></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="dot"></div><h2>請假制度</h2><div class="line"></div></div>
+      <div class="leave-box">
+        <div class="leave-icon">🏖️</div>
+        <div>
+          <div class="leave-title">每月 3 天免扣假</div>
+          <div class="leave-desc">不舒服可直接申請，<strong>不扣特休</strong><br>超過 3 天從特休扣，特休可<strong>跨月累積</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="dot"></div><h2>薪資結構</h2><div class="line"></div></div>
+      <div class="salary-box">
+        <div>
+          <div class="salary-label">週薪</div>
+          <div class="salary-amount">$2,500</div>
+          <div class="salary-unit">完成每週 5 個區域可領取</div>
+        </div>
+        <div class="salary-note">
+          <div class="salary-note-label">月薪合計</div>
+          <div class="salary-note-value">$10,000</div>
+          <div class="salary-note-sub">可抵媽媽每月家用</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rules-footer">一起把家顧好，也把自己顧好 🌱</div>
+
+  </div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+
+// ── CONSTANTS ──────────────────────────────────────────
+const ZONES = {
+  A:{name:'1樓公共區域'},
+  B:{name:'1樓廁所'},
+  C:{name:'2樓公共（含曬衣區地板）＋媽媽房'},
+  D:{name:'2樓廁所'},
+  E:{name:'3樓公共＋臥房'},
+  F:{name:'3樓廁所'},
+  G:{name:'4樓陽台＋鳥房間'},
+  H:{name:'廚房'}
+};
+const ZONE_ORDER = ['A','B','C','D','E','F','G','H'];
+const STANDARD = 2;      // standard hours per zone
+const WEEKLY_GOAL = 5;
+const WEEKLY_PAY = 2500;
+const PENALTY_PER_ZONE = 500;
+const FREE_PASSES_PER_MONTH = 3;
+
+// ── STATE ──────────────────────────────────────────────
+let entries      = []; // {id, date, zone, actualHours, recordedHours, note}
+let vacationLogs = []; // {id, date, count, reason, fromFree, fromBank}
+let penaltyPaid  = []; // {id, weekKey, amount, paidDate}
+let monthlyPasses = {}; // {"2025-04": usedCount}
+let bankCarryForward = 0; // archived bank hours from old entries
+let archivedStats = { zones: 0, weeks: 0, metWeeks: 0 }; // archived summary
+
+// ── STORAGE ────────────────────────────────────────────
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem('cleaning-v4') || 'null');
+    if (d) {
+      entries          = d.entries          || [];
+      vacationLogs     = d.vacationLogs     || [];
+      penaltyPaid      = d.penaltyPaid      || [];
+      monthlyPasses    = d.monthlyPasses    || {};
+      bankCarryForward = d.bankCarryForward || 0;
+      archivedStats    = d.archivedStats    || { zones: 0, weeks: 0, metWeeks: 0 };
+    }
+  } catch(e) {}
+  render();
+}
+
+function save() {
+  localStorage.setItem('cleaning-v4', JSON.stringify(
+    {entries, vacationLogs, penaltyPaid, monthlyPasses, bankCarryForward, archivedStats}
+  ));
+}
+
+// ── HELPERS ────────────────────────────────────────────
+function g(id) { return document.getElementById(id); }
+
+function nextZone() {
+  if (!entries.length) return 'A';
+  const last = [...entries].sort((a,b) => new Date(a.date) - new Date(b.date)).at(-1);
+  return ZONE_ORDER[(ZONE_ORDER.indexOf(last.zone) + 1) % 8];
+}
+
+function weekStart(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = d.getDay();
+  d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function weekKey(dateStr) {
+  const s = weekStart(dateStr);
+  return `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-${String(s.getDate()).padStart(2,'0')}`;
+}
+
+function formatWeekRange(mondayStr) {
+  const mon = new Date(mondayStr + 'T00:00:00');
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  return `${mon.getMonth()+1}/${mon.getDate()} – ${sun.getMonth()+1}/${sun.getDate()}`;
+}
+
+function currentYM() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;
+}
+
+function totalBankEarned() {
+  const fromEntries = +entries.reduce((s,e) => +(s + (e.recordedHours - STANDARD)).toFixed(1), 0).toFixed(1);
+  return +(fromEntries + bankCarryForward).toFixed(1);
+}
+
+function bankUsedByVacations() {
+  return +vacationLogs.reduce((s,v) => s + (v.fromBank || 0) * STANDARD, 0).toFixed(1);
+}
+
+function currentBank() {
+  return +(totalBankEarned() - bankUsedByVacations()).toFixed(1);
+}
+
+function availableVacation() {
+  const ym = currentYM();
+  const usedFree = monthlyPasses[ym] || 0;
+  const freeLeft = Math.max(0, FREE_PASSES_PER_MONTH - usedFree);
+  const bankPasses = Math.floor(currentBank() / STANDARD);
+  return { freeLeft, bankPasses, total: freeLeft + bankPasses };
+}
+
+function getDaysInRange(startDate, endDate) {
+  const days = [];
+  let current = new Date(startDate + 'T00:00:00');
+  const end = new Date(endDate + 'T00:00:00');
+  while (current <= end) {
+    days.push(current.toISOString().slice(0,10));
+    current.setDate(current.getDate() + 1);
+  }
+  return days;
+}
+
+function weekVacationCount(wk) {
+  return vacationLogs.filter(v => weekKey(v.date) === wk).reduce((s,v) => s + v.count, 0);
+}
+
+function effectiveGoal(wk) {
+  const vacUsed = weekVacationCount(wk);
+  return Math.max(0, WEEKLY_GOAL - vacUsed);
+}
+
+function consecutiveWeeks() {
+  // Count consecutive weeks (ending this week) where goal was met
+  const todayKey = weekKey(new Date().toISOString().slice(0,10));
+  let streak = 0;
+  let checkKey = todayKey;
+  for (let i = 0; i < 52; i++) {
+    const weekEntries = entries.filter(e => weekKey(e.date) === checkKey);
+    const goal = effectiveGoal(checkKey);
+    if (weekEntries.length >= goal && goal > 0) {
+      streak++;
+    } else if (checkKey !== todayKey) {
+      break; // only skip if it's not the current incomplete week
+    }
+    // Move to previous week
+    const d = new Date(checkKey + 'T00:00:00');
+    d.setDate(d.getDate() - 7);
+    checkKey = d.toISOString().slice(0,10);
+  }
+  return streak;
+}
+
+// Recorded hours rule:
+// < 1hr → not allowed
+// 1hr ≤ actual < 2hr → recorded as 2hr (no bank penalty)
+// ≥ 2hr → recorded as actual (bank contribution = actual - 2)
+function computeRecordedHours(actual) {
+  if (actual < 1) return null; // invalid
+  if (actual < STANDARD) return STANDARD; // counts as full 2hr
+  return actual;
+}
+
+// ── ENCOURAGEMENT ─────────────────────────────────────
+const PRAISE_FAST   = ['效率女王！👑','超快完成！⚡','時間掌控高手✨','閃電打掃！🌟','你也太厲害了吧！'];
+const PRAISE_NORMAL = ['穩紮穩打💪','認真負責！⭐','完美完成🎯','一步一步都很踏實','做得很好！🌿'];
+const PRAISE_EXTRA  = ['超認真！加油💪','謝謝你的用心⭐','媽媽一定很感激🥰','付出都被看見了✨','辛苦了！你最棒🌟'];
+
+function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function getPraise(actual) {
+  if (actual < STANDARD) return randomFrom(PRAISE_FAST);
+  if (actual === STANDARD) return randomFrom(PRAISE_NORMAL);
+  return randomFrom(PRAISE_EXTRA);
+}
+
+// ── RENDER ─────────────────────────────────────────────
+function render() {
+  renderCheckin();
+  renderHistory();
+  renderBank();
+  renderOverview();
+}
+
+function renderCheckin() {
+  const nz = nextZone();
+  if (g('nz-letter'))  g('nz-letter').textContent  = nz;
+  if (g('nz-name'))    g('nz-name').textContent    = ZONES[nz].name;
+  if (g('nz-desc'))    g('nz-desc').textContent    = '最少 1 小時，1–2hr 計為 2hr（不扣不存）';
+  if (g('nz-badge'))   g('nz-badge').textContent   = `第 ${ZONE_ORDER.indexOf(nz)+1} 區`;
+  if (g('locked-zone-display')) g('locked-zone-display').textContent = `${nz}｜${ZONES[nz].name}`;
+
+  // Pipeline
+  const sortedAll = [...entries].sort((a,b) => new Date(a.date) - new Date(b.date));
+  const roundStart = sortedAll.length - (sortedAll.length % 8 || 8);
+  const doneInRound = new Set(sortedAll.slice(Math.max(0, roundStart)).map(e => e.zone));
+  const pip = g('pipeline');
+  if (pip) pip.innerHTML = ZONE_ORDER.map((z,i) => {
+    const cls = doneInRound.has(z) ? 'done' : z === nz ? 'current' : '';
+    return `<div class="pl-zone ${cls}">${z}</div>${i<7?'<div class="pl-arrow">›</div>':''}`;
+  }).join('');
+
+  // Summary bar
+  const todayKey = weekKey(new Date().toISOString().slice(0,10));
+  const weZones = entries.filter(e => weekKey(e.date) === todayKey).length;
+  const goal = effectiveGoal(todayKey);
+  const shortfall = Math.max(0, goal - weZones);
+  const penalty = shortfall * PENALTY_PER_ZONE;
+  const streak = consecutiveWeeks();
+
+  if (g('sb-zones'))    g('sb-zones').innerHTML    = `${weZones}<span style="font-size:13px;color:rgba(255,255,255,0.35)">/${goal}</span>`;
+
+  const avail = availableVacation();
+  if (g('sb-bank'))     g('sb-bank').innerHTML     = `${avail.total}<span style="font-size:12px;color:rgba(255,255,255,0.35)">次</span>`;
+  const vacThisWeek = weekVacationCount(todayKey);
+  if (g('sb-bank-sub')) g('sb-bank-sub').textContent = vacThisWeek ? `本週已用 ${vacThisWeek} 次` : `免費${avail.freeLeft}＋銀行${avail.bankPasses}`;
+
+  if (weZones >= goal) {
+    if (g('sb-pay'))    { g('sb-pay').textContent = `$${WEEKLY_PAY.toLocaleString()}`; g('sb-pay').style.color = 'var(--gold)'; }
+    if (g('sb-pay-sub'))g('sb-pay-sub').textContent= streak > 1 ? `🔥 連勝 ${streak} 週！` : '目標達成 🎉';
+  } else {
+    const projectedPay = WEEKLY_PAY - penalty;
+    if (g('sb-pay'))    g('sb-pay').textContent    = projectedPay >= 0 ? `$${projectedPay.toLocaleString()}` : `-$${Math.abs(projectedPay).toLocaleString()}`;
+    if (g('sb-pay'))    g('sb-pay').style.color    = shortfall > 0 ? '#ffaa80' : 'var(--gold)';
+    if (g('sb-pay-sub'))g('sb-pay-sub').textContent= shortfall > 0 ? `差 ${shortfall} 區 → 罰 $${penalty}` : '目標 $2,500';
+  }
+}
+
+function renderHistory() {
+  const list = g('history-list');
+  if (!list) return;
+  if (g('history-count')) g('history-count').textContent = `共 ${entries.length} 筆`;
+  if (!entries.length) {
+    list.innerHTML = '<div class="history-empty">還沒有紀錄，去打第一張卡吧！🌱</div>';
+    return;
+  }
+
+  const weekMap = {};
+  entries.forEach(e => {
+    const wk = weekKey(e.date);
+    if (!weekMap[wk]) weekMap[wk] = [];
+    weekMap[wk].push(e);
+  });
+
+  const todayKey = weekKey(new Date().toISOString().slice(0,10));
+
+  list.innerHTML = Object.keys(weekMap).sort().reverse().map(wk => {
+    const we = weekMap[wk];
+    const zonesCount = we.length;
+    const totalHours = we.reduce((s,e) => s + e.actualHours, 0);
+    const goal = effectiveGoal(wk);
+    const shortfall = Math.max(0, goal - zonesCount);
+    const penalty = shortfall * PENALTY_PER_ZONE;
+    const achieved = shortfall === 0;
+    const isCurrent = wk === todayKey;
+    const paid = penaltyPaid.find(p => p.weekKey === wk);
+    const vacUsed = weekVacationCount(wk);
+
+    const headerBg = achieved
+      ? 'background:var(--ls);border-color:var(--sage);'
+      : paid
+        ? 'background:var(--lg);border-color:var(--gold);'
+        : !isCurrent && shortfall > 0
+          ? 'background:var(--lr);border-color:#C9847A;'
+          : 'background:var(--lg);border-color:var(--gold);';
+
+    const statusIcon = achieved ? '✅' : paid ? '💰' : isCurrent ? '⏳' : '⚠️';
+    const statusText = achieved
+      ? `達標！${zonesCount}/${goal} 區${vacUsed ? `（含 ${vacUsed} 次特休）` : ''}`
+      : paid
+        ? `未達標 ${zonesCount}/${goal} 區，已繳罰款`
+        : isCurrent
+          ? `進行中 ${zonesCount}/${goal} 區，還差 ${shortfall} 區`
+          : `未達標 ${zonesCount}/${goal} 區，差 ${shortfall} 區`;
+
+    const penaltyHtml = !achieved && !isCurrent
+      ? paid
+        ? `<div style="margin-top:6px;font-size:12px;font-weight:700;color:var(--sage);">✅ 已繳 $${paid.amount}（${paid.paidDate}）</div>`
+        : `<div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:var(--terra);">⚠️ 需繳 $${penalty} 給媽媽</span>
+            <button onclick="markPaid('${wk}',${penalty})" style="padding:3px 12px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">標記已繳</button>
+           </div>`
+      : '';
+
+    const rows = [...we].sort((a,b) => new Date(a.date)-new Date(b.date)).map(e => {
+      const diff = +(e.recordedHours - STANDARD).toFixed(1);
+      const diffColor = diff >= 0 ? 'var(--sage)' : 'var(--terra)';
+      const d = new Date(e.date + 'T00:00:00');
+      const counted = e.actualHours !== e.recordedHours
+        ? `<span style="color:var(--gold);font-size:9px;"> (計 ${e.recordedHours}hr)</span>` : '';
+      return `<div class="entry-item" style="padding:10px 0;">
+        <div class="entry-zone" style="width:36px;height:36px;font-size:15px;">${e.zone}</div>
+        <div class="entry-info">
+          <div class="entry-name" style="font-size:12px;">${ZONES[e.zone].name}</div>
+          <div class="entry-date">${d.getMonth()+1}/${d.getDate()}${e.note?' · '+e.note:''}</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-hours" style="font-size:14px;">${e.actualHours}<span>hr</span>${counted}</div>
+          <div style="font-size:10px;color:${diffColor};text-align:right;">${diff>=0?'+':''}${diff}hr</div>
+        </div>
+        <button class="delete-btn" onclick="deleteEntry('${e.id}')">✕</button>
+      </div>`;
+    }).join('');
+
+    return `<div style="margin-bottom:16px;border-radius:12px;border:1.5px solid;overflow:hidden;${headerBg}">
+      <div style="padding:12px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+          <div style="font-family:'Noto Serif TC',serif;font-size:13px;font-weight:700;color:var(--brown);">${statusIcon} ${formatWeekRange(wk)}${isCurrent?' <span style="font-size:10px;background:var(--terra);color:white;border-radius:10px;padding:1px 8px;">本週</span>':''}</div>
+          <div style="font-size:11px;color:var(--sage);">${totalHours}hr 合計</div>
+        </div>
+        <div style="font-size:12px;color:var(--brown);">${statusText}</div>
+        ${penaltyHtml}
+      </div>
+      <div style="padding:0 16px;border-top:1px solid rgba(0,0,0,0.06);">${rows}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBank() {
+  const bank = currentBank();
+  if (g('bh-total'))      g('bh-total').textContent      = `${bank>=0?'+':''}${bank}`;
+  const avail = availableVacation();
+  if (g('vb-balance'))    g('vb-balance').innerHTML      = `${avail.total} <span style="font-size:16px;font-weight:400;">次</span>`;
+  if (g('vb-free'))       g('vb-free').textContent       = `本月免費剩 ${avail.freeLeft} 次 ＋ 銀行可換 ${avail.bankPasses} 次`;
+
+  // Quick vacation button text
+  const qb = g('quick-vacation-btn');
+  if (qb) qb.textContent = `🏖️ 今天請假（剩 ${avail.total} 次）`;
+
+  // Entries breakdown
+  const ml = g('month-list');
+  if (ml) {
+    if (!entries.length) {
+      ml.innerHTML = '<div class="history-empty">還沒有紀錄</div>';
+    } else {
+      const sorted = [...entries].sort((a,b) => new Date(b.date)-new Date(a.date));
+      const oldToNew = [...entries].sort((a,b) => new Date(a.date)-new Date(b.date));
+      let runningFwd = -bankUsedByVacations();
+      const runningMap = {};
+      oldToNew.forEach(e => {
+        runningFwd = +(runningFwd + (e.recordedHours - STANDARD)).toFixed(1);
+        runningMap[e.id] = runningFwd;
+      });
+
+      ml.innerHTML = sorted.map(e => {
+        const diff = +(e.recordedHours - STANDARD).toFixed(1);
+        const d = new Date(e.date + 'T00:00:00');
+        const bal = runningMap[e.id];
+        const diffColor = diff >= 0 ? 'var(--sage)' : 'var(--terra)';
+        const counted = e.actualHours !== e.recordedHours ? ` (實際 ${e.actualHours}hr，計 ${e.recordedHours}hr)` : `${e.actualHours}hr`;
+        return `<div class="month-item" style="align-items:flex-start;">
+          <div class="mi-month" style="font-size:11px;color:var(--sage);min-width:42px;">${d.getMonth()+1}/${d.getDate()}</div>
+          <div class="mi-info">
+            <div class="mi-zones">${e.zone} 區・${counted}</div>
+            <div class="mi-bank" style="color:${diffColor};">${diff>=0?'+':''}${diff}hr</div>
+          </div>
+          <div style="text-align:right;font-size:11px;">
+            <div style="color:var(--sage);">餘額</div>
+            <div style="font-weight:700;color:${bal>=0?'var(--brown)':'var(--terra)'};">${bal>=0?'+':''}${bal}hr</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Vacation log
+  const vl = g('vacation-log');
+  if (vl) {
+    vl.innerHTML = !vacationLogs.length
+      ? '<div style="font-size:12px;color:var(--sage);padding:12px 0;text-align:center;">尚無申請紀錄</div>'
+      : [...vacationLogs].reverse().map(v => {
+          const wkRange = formatWeekRange(weekKey(v.date));
+          const src = v.fromBank > 0 ? `銀行${v.fromBank}次` : '';
+          const free = v.fromFree > 0 ? `免費${v.fromFree}次` : '';
+          const tag = [free, src].filter(Boolean).join('＋');
+          return `<div class="vl-item">
+            <span class="vl-date" style="min-width:90px;">${wkRange}</span>
+            <span class="vl-desc">${v.reason} <span style="color:var(--sage);font-size:10px;">${tag}</span></span>
+            <span class="vl-hours">-${v.count}次</span>
+          </div>`;
+        }).join('');
+  }
+}
+
+function renderOverview() {
+  if (!entries.length) {
+    if (g('ov-weeks')) g('ov-weeks').innerHTML = '<div class="history-empty">還沒有資料</div>';
+    if (g('ov-vacation')) g('ov-vacation').innerHTML = '<div class="history-empty">尚無特休紀錄</div>';
+    return;
+  }
+
+  const todayKey = weekKey(new Date().toISOString().slice(0,10));
+
+  // Collect all weeks that have entries or vacations
+  const allWeeks = new Set();
+  entries.forEach(e => allWeeks.add(weekKey(e.date)));
+  vacationLogs.forEach(v => allWeeks.add(weekKey(v.date)));
+  const weekList = [...allWeeks].sort().reverse();
+
+  let totalWeeks = 0, metWeeks = 0, totalUnpaid = 0;
+  const unpaidList = [];
+  const weekRows = [];
+
+  weekList.forEach(wk => {
+    const we = entries.filter(e => weekKey(e.date) === wk);
+    const zonesCount = we.length;
+    const goal = effectiveGoal(wk);
+    const shortfall = Math.max(0, goal - zonesCount);
+    const achieved = shortfall === 0;
+    const isCurrent = wk === todayKey;
+    const paid = penaltyPaid.find(p => p.weekKey === wk);
+    const vacUsed = weekVacationCount(wk);
+    const penalty = shortfall * PENALTY_PER_ZONE;
+
+    if (!isCurrent) {
+      totalWeeks++;
+      if (achieved) metWeeks++;
+    }
+
+    // Unpaid penalties
+    if (!achieved && !isCurrent && !paid && penalty > 0) {
+      totalUnpaid += penalty;
+      unpaidList.push({ wk, penalty, shortfall, goal, zonesCount });
+    }
+
+    // Status icon and color
+    let icon, bg, statusText;
+    if (achieved) {
+      icon = '✅'; bg = 'var(--ls)';
+      statusText = `達標 ${zonesCount}/${goal} 區${vacUsed ? `（特休 ${vacUsed} 次）` : ''}`;
+    } else if (isCurrent) {
+      icon = '⏳'; bg = 'var(--lg)';
+      statusText = `進行中 ${zonesCount}/${goal} 區，差 ${shortfall} 區`;
+    } else if (paid) {
+      icon = '💰'; bg = 'var(--lg)';
+      statusText = `未達標 ${zonesCount}/${goal}，已繳 $${paid.amount}`;
+    } else {
+      icon = '⚠️'; bg = 'var(--lr)';
+      statusText = `未達標 ${zonesCount}/${goal}，需繳 $${penalty}`;
+    }
+
+    weekRows.push(`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--warm);">
+      <div style="font-size:18px;flex-shrink:0;">${icon}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:var(--brown);">${formatWeekRange(wk)}${isCurrent?' <span style="font-size:10px;background:var(--terra);color:white;border-radius:10px;padding:1px 8px;">本週</span>':''}</div>
+        <div style="font-size:11px;color:var(--sage);margin-top:2px;">${statusText}</div>
+      </div>
+    </div>`);
+  });
+
+  // Stats (include archived)
+  const grandZones = entries.length + archivedStats.zones;
+  const grandWeeks = totalWeeks + archivedStats.weeks;
+  const grandMet = metWeeks + archivedStats.metWeeks;
+  if (g('ov-total')) g('ov-total').innerHTML = `${grandZones}<span style="font-size:12px;color:rgba(255,255,255,0.35)">區</span>`;
+  if (g('ov-rate')) {
+    const rate = grandWeeks > 0 ? Math.round(grandMet / grandWeeks * 100) : 0;
+    g('ov-rate').innerHTML = grandWeeks > 0
+      ? `${rate}<span style="font-size:12px;color:rgba(255,255,255,0.35)">%</span>`
+      : '—';
+  }
+  if (g('ov-streak')) g('ov-streak').innerHTML = `${consecutiveWeeks()}<span style="font-size:12px;color:rgba(255,255,255,0.35)">週</span>`;
+  if (g('ov-unpaid')) {
+    g('ov-unpaid').textContent = totalUnpaid > 0 ? `$${totalUnpaid.toLocaleString()}` : '$0';
+    g('ov-unpaid').style.color = totalUnpaid > 0 ? '#ffaa80' : 'var(--gold)';
+  }
+
+  // Unpaid card
+  const unpaidCard = g('ov-unpaid-card');
+  if (unpaidCard) {
+    if (unpaidList.length) {
+      unpaidCard.style.display = 'block';
+      g('ov-unpaid-list').innerHTML = unpaidList.map(u =>
+        `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--warm);">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--terra);">${formatWeekRange(u.wk)}</div>
+            <div style="font-size:11px;color:var(--sage);">完成 ${u.zonesCount}/${u.goal} 區，差 ${u.shortfall} 區</div>
+          </div>
+          <div style="font-family:'Noto Serif TC',serif;font-size:16px;font-weight:700;color:var(--terra);">$${u.penalty}</div>
+          <button onclick="markPaid('${u.wk}',${u.penalty})" style="padding:5px 14px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">標記已繳</button>
+        </div>`
+      ).join('');
+    } else {
+      unpaidCard.style.display = 'none';
+    }
+  }
+
+  // Week list
+  if (g('ov-week-count')) g('ov-week-count').textContent = `共 ${weekList.length} 週`;
+  if (g('ov-weeks')) g('ov-weeks').innerHTML = weekRows.join('') || '<div class="history-empty">還沒有資料</div>';
+
+  // Vacation log
+  if (g('ov-vacation')) {
+    g('ov-vacation').innerHTML = !vacationLogs.length
+      ? '<div class="history-empty">尚無特休紀錄</div>'
+      : [...vacationLogs].reverse().map(v => {
+          const wkRange = formatWeekRange(weekKey(v.date));
+          const src = v.fromBank > 0 ? `銀行${v.fromBank}次` : '';
+          const free = v.fromFree > 0 ? `免費${v.fromFree}次` : '';
+          const tag = [free, src].filter(Boolean).join('＋');
+          return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--warm);">
+            <div style="font-size:14px;flex-shrink:0;">🏖️</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:var(--brown);">${wkRange}</div>
+              <div style="font-size:11px;color:var(--sage);">${v.reason} · <span style="color:var(--sage);">${tag}</span></div>
+            </div>
+            <div style="font-family:'Noto Serif TC',serif;font-size:14px;font-weight:700;color:var(--terra);">-${v.count}次</div>
+          </div>`;
+        }).join('');
+  }
+}
+
+// ── ACTIONS ────────────────────────────────────────────
+function submitEntry() {
+  const date  = g('input-date') ? g('input-date').value : '';
+  const actual = parseFloat(g('input-hours') ? g('input-hours').value : '');
+  const note  = g('input-note') ? g('input-note').value.trim() : '';
+  const zone  = nextZone();
+
+  if (!date)              { toast('請選擇日期 📅'); return; }
+  if (!actual || actual <= 0) { toast('請輸入花費時間 ⏱️'); return; }
+  if (actual < 1)         { toast('最少需要 1 小時才算完成一個區域'); return; }
+
+  const recorded = computeRecordedHours(actual);
+
+  entries.push({ id: Date.now().toString(), date, zone, actualHours: actual, recordedHours: recorded, note });
+  save();
+
+  if (g('input-hours')) g('input-hours').value = '';
+  if (g('input-note'))  g('input-note').value  = '';
+  clearHourBtns();
+
+  const praise = getPraise(actual);
+  const countedNote = actual < STANDARD ? `（計為 2hr）` : '';
+  toast(`${zone} 區完成！${countedNote} ${praise}`);
+
+  // Celebrate if weekly goal just hit
+  const todayKey = weekKey(date);
+  const weZones = entries.filter(e => weekKey(e.date) === todayKey).length;
+  if (weZones === effectiveGoal(todayKey)) {
+    setTimeout(() => toast('🎉 本週目標達成！太棒了！'), 2800);
+  }
+
+  render();
+}
+
+function deleteEntry(id) {
+  if (!confirm('確定要刪除這筆紀錄嗎？')) return;
+  entries = entries.filter(e => e.id !== id);
+  save(); render(); toast('已刪除');
+}
+
+function markPaid(wk, amount) {
+  if (penaltyPaid.find(p => p.weekKey === wk)) return;
+  const today = new Date();
+  penaltyPaid.push({ id: Date.now().toString(), weekKey: wk, amount, paidDate: `${today.getMonth()+1}/${today.getDate()}` });
+  save(); render(); toast(`已記錄繳款 $${amount} ✅`);
+}
+
+function applyVacation(startDate, endDate, reason) {
+  const days = getDaysInRange(startDate, endDate);
+  const totalCount = days.length;
+
+  // Group days by week
+  const weekGroups = {};
+  days.forEach(d => {
+    const wk = weekKey(d);
+    if (!weekGroups[wk]) weekGroups[wk] = { count: 0, date: d };
+    weekGroups[wk].count++;
+  });
+
+  // Calculate free vs bank (free passes from start date's month)
+  const ym = startDate.slice(0,7);
+  const usedFree = monthlyPasses[ym] || 0;
+  const freeLeft = Math.max(0, FREE_PASSES_PER_MONTH - usedFree);
+  const fromFree = Math.min(totalCount, freeLeft);
+  const fromBank = totalCount - fromFree;
+  const bankAvailable = Math.floor(currentBank() / STANDARD);
+
+  if (fromBank > bankAvailable) {
+    toast(`不夠！免費剩 ${freeLeft} 次，銀行可換 ${bankAvailable} 次，共需 ${totalCount} 次`);
+    return false;
+  }
+
+  // Deduct free passes
+  monthlyPasses[ym] = usedFree + fromFree;
+
+  // Create one log entry per week
+  let remainFree = fromFree;
+  Object.keys(weekGroups).sort().forEach(wk => {
+    const grp = weekGroups[wk];
+    const thisFree = Math.min(grp.count, remainFree);
+    const thisBank = grp.count - thisFree;
+    remainFree -= thisFree;
+    vacationLogs.push({
+      id: Date.now().toString() + '_' + wk,
+      date: grp.date,
+      count: grp.count,
+      reason,
+      fromFree: thisFree,
+      fromBank: thisBank
+    });
+  });
+
+  save(); render();
+  return { totalCount, weeks: Object.keys(weekGroups).length, fromFree, fromBank };
+}
+
+function useVacation() {
+  const startDate = g('vacation-start') ? g('vacation-start').value : '';
+  const endDate = g('vacation-end') ? g('vacation-end').value : '';
+  const reason = g('vacation-reason') ? g('vacation-reason').value.trim() : '';
+  if (!startDate) { toast('請選擇開始日期 📅'); return; }
+  const end = endDate || startDate;
+  if (end < startDate) { toast('結束日期不能早於開始日期'); return; }
+
+  const result = applyVacation(startDate, end, reason || '請假');
+  if (!result) return;
+
+  if (g('vacation-start')) g('vacation-start').value = '';
+  if (g('vacation-end')) g('vacation-end').value = '';
+  if (g('vacation-reason')) g('vacation-reason').value = '';
+
+  if (result.totalCount === 1) {
+    const wkRange = formatWeekRange(weekKey(startDate));
+    toast(`已申請 1 次特休，套用於 ${wkRange} ✅`);
+  } else {
+    toast(`已申請 ${result.totalCount} 天特休（跨 ${result.weeks} 週）✅`);
+  }
+}
+
+function quickVacationToday() {
+  const avail = availableVacation();
+  if (avail.total <= 0) { toast('沒有可用特休了 😢'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  if (!confirm(`確定要申請今天請假嗎？\n（剩餘 ${avail.total} 次，用掉 1 次）`)) return;
+  const result = applyVacation(today, today, '今天請假');
+  if (result) toast('今天請假成功！好好休息 🏖️');
+}
+
+function resetAll() {
+  if (!confirm('確定要清空所有資料？無法復原。')) return;
+  entries = []; vacationLogs = []; penaltyPaid = []; monthlyPasses = {};
+  bankCarryForward = 0; archivedStats = { zones: 0, weeks: 0, metWeeks: 0 };
+  save(); render(); toast('已清空 🗑️');
+}
+
+// ── ARCHIVE ────────────────────────────────────────────
+function archiveOld() {
+  if (entries.length < 10) { toast('紀錄太少，不需要歸檔'); return; }
+
+  // Keep recent 2 months, archive the rest
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - 2);
+  cutoff.setDate(1); // 1st of 2 months ago
+  const cutoffStr = `${cutoff.getFullYear()}-${String(cutoff.getMonth()+1).padStart(2,'0')}-01`;
+
+  const oldEntries = entries.filter(e => e.date < cutoffStr);
+  const keepEntries = entries.filter(e => e.date >= cutoffStr);
+
+  if (!oldEntries.length) { toast('近 2 個月內沒有可歸檔的舊資料'); return; }
+
+  // Calculate stats from old entries
+  const oldBankContrib = +oldEntries.reduce((s,e) => +(s + (e.recordedHours - STANDARD)).toFixed(1), 0).toFixed(1);
+
+  const todayKey = weekKey(new Date().toISOString().slice(0,10));
+  const oldWeeks = new Set();
+  oldEntries.forEach(e => oldWeeks.add(weekKey(e.date)));
+  let oldMetWeeks = 0;
+  oldWeeks.forEach(wk => {
+    if (wk === todayKey) return;
+    const count = oldEntries.filter(e => weekKey(e.date) === wk).length;
+    const goal = effectiveGoal(wk);
+    if (count >= goal) oldMetWeeks++;
+  });
+
+  // Archive old vacation logs & penalty records too
+  const oldVacLogs = vacationLogs.filter(v => v.date < cutoffStr);
+  const keepVacLogs = vacationLogs.filter(v => v.date >= cutoffStr);
+  const oldPenalty = penaltyPaid.filter(p => p.weekKey < cutoffStr);
+  const keepPenalty = penaltyPaid.filter(p => p.weekKey >= cutoffStr);
+
+  const msg = `將歸檔 ${cutoffStr} 之前的資料：\n` +
+    `• ${oldEntries.length} 筆打卡紀錄\n` +
+    `• ${oldVacLogs.length} 筆特休紀錄\n` +
+    `• 銀行時數 ${oldBankContrib >= 0 ? '+' : ''}${oldBankContrib}hr 轉入累計\n\n` +
+    `歸檔後無法復原（建議先備份）。確定嗎？`;
+
+  if (!confirm(msg)) return;
+
+  bankCarryForward = +(bankCarryForward + oldBankContrib).toFixed(1);
+  archivedStats.zones += oldEntries.length;
+  archivedStats.weeks += oldWeeks.size;
+  archivedStats.metWeeks += oldMetWeeks;
+
+  entries = keepEntries;
+  vacationLogs = keepVacLogs;
+  penaltyPaid = keepPenalty;
+
+  save(); render();
+  toast(`已歸檔 ${oldEntries.length} 筆舊資料 📦`);
+}
+
+// ── BACKUP & RESTORE ───────────────────────────────────
+function exportBackup() {
+  const data = JSON.parse(localStorage.getItem('cleaning-v4') || '{}');
+  data._backupDate = new Date().toISOString();
+  data._version = 'v4';
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cleaning-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('備份檔已下載 💾');
+}
+
+function importBackup() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.entries || !Array.isArray(data.entries)) {
+          toast('檔案格式不正確 ❌'); return;
+        }
+        if (!confirm(`確定要還原備份嗎？\n（${data._backupDate ? '備份日期：' + data._backupDate.slice(0,10) : '未知日期'}，${data.entries.length} 筆紀錄）\n\n⚠️ 會覆蓋目前所有資料`)) return;
+        localStorage.setItem('cleaning-v4', JSON.stringify(data));
+        load();
+        toast('還原成功 ✅');
+      } catch(err) {
+        toast('檔案讀取失敗 ❌');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// ── UI ─────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) =>
+    t.classList.toggle('active', ['checkin','history','bank','overview','rules'][i] === name));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = g('page-' + name);
+  if (pg) pg.classList.add('active');
+  render();
+}
+
+function selectHour(h) {
+  if (g('input-hours')) g('input-hours').value = h;
+  document.querySelectorAll('.hour-btn').forEach(b =>
+    b.classList.toggle('selected', parseFloat(b.textContent) === h));
+}
+
+function clearHourBtns() {
+  document.querySelectorAll('.hour-btn').forEach(b => b.classList.remove('selected'));
+}
+
+function toast(msg) {
+  const t = g('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function setToday() {
+  const n = new Date();
+  const v = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+  if (g('input-date')) g('input-date').value = v;
+}
+
+// ── INIT ───────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  setToday();
+  load();
+});
+</script>
+</body>
+</html>
