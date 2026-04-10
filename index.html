@@ -217,17 +217,18 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
 <body>
 <div class="app">
 
-  <div class="header">
-    <h1>打掃打卡系統</h1>
-    <p>妹妹專屬 · 每日記錄</p>
+  <div class="header" style="position:relative;">
+    <button id="lang-toggle" onclick="setLang(LANG==='zh'?'en':'zh')" style="position:absolute;right:0;top:0;background:var(--warm);border:none;border-radius:8px;padding:4px 10px;font-size:11px;color:var(--brown);cursor:pointer;font-weight:600;">🌐 EN</button>
+    <h1 data-i18n="title">打掃打卡系統</h1>
+    <p data-i18n="subtitle">妹妹專屬 · 每日記錄</p>
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('checkin')">📋 打卡</button>
-    <button class="tab" onclick="switchTab('history')">📅 紀錄</button>
-    <button class="tab" onclick="switchTab('bank')">🏦 時間銀行</button>
-    <button class="tab" onclick="switchTab('overview')">👀 家人總覽</button>
-    <button class="tab" onclick="switchTab('rules')">📖 制度</button>
+    <button class="tab active" onclick="switchTab('checkin')" data-i18n="tabCheckin">📋 打卡</button>
+    <button class="tab" onclick="switchTab('history')" data-i18n="tabHistory">📅 紀錄</button>
+    <button class="tab" onclick="switchTab('bank')" data-i18n="tabBank">🏦 時間銀行</button>
+    <button class="tab" onclick="switchTab('overview')" data-i18n="tabOverview">👀 家人總覽</button>
+    <button class="tab" onclick="switchTab('rules')" data-i18n="tabRules">📖 制度</button>
   </div>
 
   <!-- ===== TAB: CHECKIN ===== -->
@@ -235,19 +236,19 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
 
     <div class="summary-bar">
       <div class="sb-item">
-        <div class="sb-label">本週完成</div>
+        <div class="sb-label" data-i18n="thisWeek">本週完成</div>
         <div class="sb-value" id="sb-zones">0<span style="font-size:13px;color:rgba(255,255,255,0.35)">/5</span></div>
         <div class="sb-sub">個區域</div>
       </div>
       <div class="sb-divider"></div>
       <div class="sb-item">
-        <div class="sb-label">特休餘額</div>
+        <div class="sb-label" data-i18n="daysOff">特休餘額</div>
         <div class="sb-value" id="sb-bank">0<span style="font-size:12px;color:rgba(255,255,255,0.35)">次</span></div>
         <div class="sb-sub" id="sb-bank-sub">免費+銀行可換</div>
       </div>
       <div class="sb-divider"></div>
       <div class="sb-item">
-        <div class="sb-label">本週薪資</div>
+        <div class="sb-label" data-i18n="weeklyPay">本週薪資</div>
         <div class="sb-value" id="sb-pay" style="color:var(--gold);">$0</div>
         <div class="sb-sub" id="sb-pay-sub">目標 $2,500</div>
       </div>
@@ -256,7 +257,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <!-- NEXT ZONE -->
     <div class="next-zone-card">
       <div class="nz-top">
-        <span class="nz-label">下一個區域</span>
+        <span class="nz-label" data-i18n="nextZone">下一個區域</span>
         <span class="nz-badge" id="nz-badge">待完成</span>
       </div>
       <div class="nz-body">
@@ -273,7 +274,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
 
     <!-- PIPELINE -->
     <div class="card" style="padding:14px 16px;">
-      <div style="font-size:10px;letter-spacing:2px;color:var(--sage);font-weight:700;margin-bottom:10px;">本輪進度</div>
+      <div style="font-size:10px;letter-spacing:2px;color:var(--sage);font-weight:700;margin-bottom:10px;" data-i18n="roundProgress">本輪進度</div>
       <div class="pipeline" id="pipeline"></div>
     </div>
 
@@ -281,24 +282,24 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="card">
       <div class="card-title">
         <div class="card-dot"></div>
-        <h2>今日打卡</h2>
+        <h2 data-i18n="todayCheckin">今日打卡</h2>
       </div>
 
       <div class="form-row">
-        <label class="form-label">📅 日期</label>
+        <label class="form-label" data-i18n="dateLabel">📅 日期</label>
         <input type="date" class="form-input" id="input-date">
       </div>
 
       <div class="form-row">
-        <label class="form-label">🏠 打卡區域</label>
+        <label class="form-label" data-i18n="zoneLabel">🏠 打卡區域</label>
         <div style="padding:12px 14px;background:var(--lg);border-radius:10px;border:1.5px solid var(--gold);font-size:14px;color:var(--brown);font-weight:600;" id="locked-zone-display">
           — 載入中 —
         </div>
-        <div style="font-size:11px;color:var(--sage);margin-top:6px;">區域依順序執行，完成後自動更新至下一區</div>
+        <div style="font-size:11px;color:var(--sage);margin-top:6px;" data-i18n="zoneAutoNote">區域依順序執行，完成後自動更新至下一區</div>
       </div>
 
       <div class="form-row">
-        <label class="form-label">⏱️ 花費時間（小時）</label>
+        <label class="form-label" data-i18n="hoursLabel">⏱️ 花費時間（小時）</label>
         <div class="hours-row" id="hours-btns">
           <button class="hour-btn" onclick="selectHour(0.5)">0.5</button>
           <button class="hour-btn" onclick="selectHour(1)">1</button>
@@ -315,11 +316,11 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
       </div>
 
       <div class="form-row">
-        <label class="form-label">📝 備註（選填）</label>
+        <label class="form-label" data-i18n="noteLabel">📝 備註（選填）</label>
         <input type="text" class="form-input" id="input-note" placeholder="例：順便擦了牆壁">
       </div>
 
-      <button class="submit-btn" onclick="submitEntry()" id="submit-btn">✓ 完成打卡</button>
+      <button class="submit-btn" onclick="submitEntry()" id="submit-btn" data-i18n="submitBtn">✓ 完成打卡</button>
     </div>
   </div>
 
@@ -328,7 +329,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="card">
       <div class="card-title">
         <div class="card-dot"></div>
-        <h2>打卡紀錄</h2>
+        <h2 data-i18n="historyTitle">打卡紀錄</h2>
         <span class="card-right" id="history-count"></span>
       </div>
       <div id="history-list"><div class="history-empty">還沒有紀錄，去打第一張卡吧！🌱</div></div>
@@ -339,17 +340,17 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
   <div class="page" id="page-bank">
 
     <div class="bank-hero">
-      <div class="bh-label">目前時間存款</div>
+      <div class="bh-label" data-i18n="bankTitle">目前時間存款</div>
       <div class="bh-value" id="bh-total">0</div>
-      <div class="bh-unit">小時（每 2hr = 1 次特休）</div>
-      <div class="bh-note">累積滿 2hr 隨時可兌換，跨月持續計算</div>
+      <div class="bh-unit" data-i18n="bankUnit">小時（每 2hr = 1 次特休）</div>
+      <div class="bh-note" data-i18n="bankNote">累積滿 2hr 隨時可兌換，跨月持續計算</div>
     </div>
 
     <!-- VACATION STATUS -->
     <div class="vacation-box">
       <div class="vb-icon">🏖️</div>
       <div style="flex:1;">
-        <div class="vb-label">可用特休</div>
+        <div class="vb-label" data-i18n="availDaysOff">可用特休</div>
         <div class="vb-value" id="vb-balance">0 <span style="font-size:16px;font-weight:400;">次</span></div>
         <div class="vb-sub" id="vb-free">本月免費剩 3 次 ＋ 銀行可換 0 次</div>
       </div>
@@ -359,11 +360,11 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="card">
       <div class="card-title">
         <div class="card-dot"></div>
-        <h2>申請特休</h2>
+        <h2 data-i18n="applyDayOff">申請特休</h2>
       </div>
-      <div style="font-size:12px;color:var(--sage);margin-bottom:12px;">每月 <strong style="color:var(--terra);">3 次免費</strong>，用完自動從時間銀行扣（每 2hr = 1 次）</div>
+      <div style="font-size:12px;color:var(--sage);margin-bottom:12px;" data-i18n="applyDayOffDesc" data-i18n-html="1">每月 <strong style="color:var(--terra);">3 次免費</strong>，用完自動從時間銀行扣（每 2hr = 1 次）</div>
       <div class="form-row">
-        <label class="form-label">📅 請假日期</label>
+        <label class="form-label" data-i18n="vacDateLabel">📅 請假日期</label>
         <div style="display:flex;gap:8px;align-items:center;">
           <input type="date" class="form-input" id="vacation-start" style="flex:1;">
           <span style="font-size:12px;color:var(--sage);">到</span>
@@ -372,11 +373,11 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
         <div style="font-size:11px;color:var(--sage);margin-top:6px;">只填開始 = 請 1 天；填起迄 = 連續請假，自動分配到對應週</div>
       </div>
       <div class="form-row">
-        <label class="form-label">申請原因（選填）</label>
+        <label class="form-label" data-i18n="vacReasonLabel">申請原因（選填）</label>
         <input type="text" class="form-input" id="vacation-reason" placeholder="例：身體不舒服、旅遊">
       </div>
       <div id="vacation-preview" style="font-size:12px;color:var(--brown);margin-bottom:12px;display:none;"></div>
-      <button class="use-btn" style="width:100%;padding:12px;" onclick="useVacation()">申請特休</button>
+      <button class="use-btn" style="width:100%;padding:12px;" onclick="useVacation()" data-i18n="vacSubmit">申請特休</button>
       <div class="vacation-log" id="vacation-log"></div>
     </div>
 
@@ -384,7 +385,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="card">
       <div class="card-title">
         <div class="card-dot"></div>
-        <h2>每月明細</h2>
+        <h2 data-i18n="monthlyBreakdown">每月明細</h2>
       </div>
       <div class="month-list" id="month-list">
         <div class="history-empty">還沒有紀錄</div>
@@ -395,14 +396,14 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="card" style="border-color:var(--warm);">
       <div class="card-title">
         <div class="card-dot" style="background:var(--sage);"></div>
-        <h2>資料管理</h2>
+        <h2 data-i18n="dataManage">資料管理</h2>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;">
-        <button onclick="exportBackup()" style="width:100%;padding:11px;background:var(--sage);border:none;border-radius:10px;color:white;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">💾 匯出備份</button>
-        <button onclick="importBackup()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--sage);border-radius:10px;color:var(--sage);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📂 匯入還原</button>
-        <button onclick="restoreFromCloud()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">☁️ 從雲端備份還原</button>
-        <button onclick="archiveOld()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--gold);border-radius:10px;color:var(--brown);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📦 歸檔舊資料（保留近 2 月）</button>
-        <button onclick="resetAll()" style="width:100%;padding:11px;background:none;border:1.5px solid #ddd;border-radius:10px;color:#bbb;font-family:'Noto Sans TC',sans-serif;font-size:11px;cursor:pointer;">🗑️ 清空全部資料</button>
+        <button onclick="exportBackup()" style="width:100%;padding:11px;background:var(--sage);border:none;border-radius:10px;color:white;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;" data-i18n="exportBackup">💾 匯出備份</button>
+        <button onclick="importBackup()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--sage);border-radius:10px;color:var(--sage);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;" data-i18n="importRestore">📂 匯入還原</button>
+        <button onclick="restoreFromCloud()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;" data-i18n="cloudRestore">☁️ 從雲端備份還原</button>
+        <button onclick="archiveOld()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--gold);border-radius:10px;color:var(--brown);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;" data-i18n="archiveOld">📦 歸檔舊資料（保留近 2 月）</button>
+        <button onclick="resetAll()" style="width:100%;padding:11px;background:none;border:1.5px solid #ddd;border-radius:10px;color:#bbb;font-family:'Noto Sans TC',sans-serif;font-size:11px;cursor:pointer;" data-i18n="clearAll">🗑️ 清空全部資料</button>
       </div>
     </div>
 
@@ -584,16 +585,299 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
 
 <script>
 
+// ── i18n ──────────────────────────────────────────────
+let LANG = new URLSearchParams(location.search).get('lang') || localStorage.getItem('cleaning-lang') || 'zh';
+
+const I18N = {
+  zh: {
+    title: '打掃打卡系統', subtitle: '妹妹專屬 · 每日記錄',
+    tabCheckin: '📋 打卡', tabHistory: '📅 紀錄', tabBank: '🏦 時間銀行', tabOverview: '👀 家人總覽', tabRules: '📖 制度',
+    thisWeek: '本週完成', daysOff: '特休餘額', weeklyPay: '本週薪資', zones: '個區域', times: '次',
+    nextZone: '下一個區域', pending: '待完成', zoneN: n => `第 ${n} 區`,
+    minHours: '最少 1 小時，1–2hr 計為 2hr（不扣不存）',
+    dayOffToday: n => `🏖️ 今天請假（剩 ${n} 次）`,
+    roundProgress: '本輪進度',
+    todayCheckin: '今日打卡', dateLabel: '📅 日期', zoneLabel: '🏠 打卡區域',
+    zoneAutoNote: '區域依順序執行，完成後自動更新至下一區',
+    hoursLabel: '⏱️ 花費時間（小時）', custom: '自訂：', hourUnit: '小時',
+    noteLabel: '📝 備註（選填）', notePlaceholder: '例：順便擦了牆壁',
+    submitBtn: '✓ 完成打卡',
+    historyTitle: '打卡紀錄', totalN: n => `共 ${n} 筆`, noRecords: '還沒有紀錄，去打第一張卡吧！🌱',
+    bankTitle: '目前時間存款', bankUnit: '小時（每 2hr = 1 次特休）', bankNote: '累積滿 2hr 隨時可兌換，跨月持續計算',
+    availDaysOff: '可用特休',
+    freeSub: (f, b) => `本月免費剩 ${f} 次 ＋ 銀行可換 ${b} 次`,
+    usedThisWeek: n => `本週已用 ${n} 次`,
+    freeAndBank: (f, b) => `免費${f}＋銀行${b}`,
+    applyDayOff: '申請特休',
+    applyDayOffDesc: '每月 <strong style="color:var(--terra);">3 次免費</strong>，用完自動從時間銀行扣（每 2hr = 1 次）',
+    vacDateLabel: '📅 請假日期', vacTo: '到',
+    vacDateNote: '只填開始 = 請 1 天；填起迄 = 連續請假，自動分配到對應週',
+    vacReasonLabel: '申請原因（選填）', vacReasonPlaceholder: '例：身體不舒服、旅遊',
+    vacSubmit: '申請特休',
+    monthlyBreakdown: '每月明細', noRecordsShort: '還沒有紀錄',
+    dataManage: '資料管理',
+    exportBackup: '💾 匯出備份', importRestore: '📂 匯入還原',
+    cloudRestore: '☁️ 從雲端備份還原',
+    archiveOld: '📦 歸檔舊資料（保留近 2 月）', clearAll: '🗑️ 清空全部資料',
+    ovTotal: '總完成', ovRate: '達標率', ovStreak: '連勝', ovUnpaid: '未繳罰款',
+    ovUnpaidTitle: '未繳罰款', ovWeeklyStatus: '每週狀態', ovVacLog: '特休使用紀錄',
+    weeksN: n => `共 ${n} 週`, noData: '還沒有資料', noVacLog: '尚無特休紀錄',
+    zoneUnit: '區', weekUnit: '週',
+    // Dynamic render strings
+    achieved: (done, goal, vac) => `達標！${done}/${goal} 區${vac ? `（含 ${vac} 次特休）` : ''}`,
+    achievedShort: (done, goal, vac) => `達標 ${done}/${goal} 區${vac ? `（特休 ${vac} 次）` : ''}`,
+    inProgress: (done, goal, left) => `進行中 ${done}/${goal} 區，還差 ${left} 區`,
+    inProgressShort: (done, goal, left) => `進行中 ${done}/${goal} 區，差 ${left} 區`,
+    notMet: (done, goal, left) => `未達標 ${done}/${goal} 區，差 ${left} 區`,
+    notMetPaid: (done, goal) => `未達標 ${done}/${goal}，已繳罰款`,
+    notMetPaidAmt: (done, goal, amt) => `未達標 ${done}/${goal}，已繳 $${amt}`,
+    notMetOwes: (done, goal, amt) => `未達標 ${done}/${goal}，需繳 $${amt}`,
+    thisWeekBadge: '本週', hrTotal: 'hr 合計',
+    paidLabel: (amt, date) => `✅ 已繳 $${amt}（${date}）`,
+    owesLabel: amt => `⚠️ 需繳 $${amt} 給媽媽`,
+    markPaid: '標記已繳',
+    completed: (done, goal, left) => `完成 ${done}/${goal} 區，差 ${left} 區`,
+    goalReached: '目標達成 🎉', streakN: n => `🔥 連勝 ${n} 週！`,
+    shortfall: (n, p) => `差 ${n} 區 → 罰 $${p}`, payTarget: '目標 $2,500',
+    loading: '— 載入中 —',
+    balance: '餘額', zone: '區',
+    actual: (a, r) => `實際 ${a}hr，計 ${r}hr`,
+    noVacYet: '尚無申請紀錄',
+    bankN: n => `銀行${n}次`, freeN: n => `免費${n}次`,
+    selectDate: '請選擇日期 📅', enterHours: '請輸入花費時間 ⏱️',
+    minOneHour: '最少需要 1 小時才算完成一個區域',
+    zoneComplete: (z, note) => `${z} 區完成！${note}`,
+    countedAs2: '（計為 2hr）',
+    weekGoalReached: '🎉 本週目標達成！太棒了！',
+    confirmDelete: '確定要刪除這筆紀錄嗎？', deleted: '已刪除',
+    paidRecorded: amt => `已記錄繳款 $${amt} ✅`,
+    vacSelectDate: '請選擇開始日期 📅', vacEndBeforeStart: '結束日期不能早於開始日期',
+    vacDefault: '請假',
+    vacApplied1: range => `已申請 1 次特休，套用於 ${range} ✅`,
+    vacAppliedN: (n, w) => `已申請 ${n} 天特休（跨 ${w} 週）✅`,
+    noDaysOff: '沒有可用特休了 😢',
+    confirmDayOff: (total) => `確定要申請今天請假嗎？\n（剩餘 ${total} 次，用掉 1 次）`,
+    dayOffSuccess: '今天請假成功！好好休息 🏖️',
+    confirmClearAll: '確定要清空所有資料？無法復原。', cleared: '已清空 🗑️',
+    tooFewRecords: '紀錄太少，不需要歸檔',
+    noOldData: '近 2 個月內沒有可歸檔的舊資料',
+    archiveMsg: (date, entries, vac, bank) => `將歸檔 ${date} 之前的資料：\n• ${entries} 筆打卡紀錄\n• ${vac} 筆特休紀錄\n• 銀行時數 ${bank}hr 轉入累計\n\n歸檔後無法復原（建議先備份）。確定嗎？`,
+    archived: n => `已歸檔 ${n} 筆舊資料 📦`,
+    backupDownloaded: '備份檔已下載',
+    invalidFile: '檔案格式不正確 ❌', readFailed: '檔案讀取失敗 ❌',
+    confirmRestore: (date, n) => `確定要還原備份嗎？\n（${date ? '備份日期：' + date : '未知日期'}，${n} 筆紀錄）\n\n會覆蓋目前所有資料`,
+    restored: '還原成功',
+    noCloudBackup: '沒有雲端備份', invalidChoice: '無效的選擇',
+    cloudRestorePrompt: (options, max) => `選擇要還原的雲端備份：\n\n${options}\n\n輸入數字（1-${max}）：`,
+    cloudRestoreConfirm: date => `確定要還原 ${date} 的備份嗎？\n\n會覆蓋目前所有資料`,
+    cloudRestored: '已從雲端備份還原',
+    notEnough: (free, bank, need) => `不夠！免費剩 ${free} 次，銀行可換 ${bank} 次，共需 ${need} 次`,
+    // Rules page
+    rulesMustOrder: '必須按照順序執行',
+    rulesOrderDesc: '區域依序完成，<strong>不能跳過</strong>。做完 H 後重新從 A 開始循環。',
+    rulesCycle: '循環',
+    rulesZonesTitle: '八大打掃區域',
+    rulesExecTitle: '執行規則',
+    rulesSeqLabel: '順序執行', rulesSeqValue: '依 <strong>A→H 順序</strong>逐區完成，進度跨週延續',
+    rulesGoalLabel: '週目標', rulesGoalValue: '每週完成 <strong>5 個區域</strong>，每區標準 <strong>2 小時</strong>',
+    rulesHelpLabel: '機動協助', rulesHelpValue: '<strong>主動詢問</strong>媽媽需要什麼幫忙',
+    rulesCycleLabel: '循環制', rulesCycleValue: '做完 H 後重新從 <strong>A 開始</strong>',
+    rulesDailyTitle: '每日 / 每週固定任務',
+    rulesEveryNight: '每天晚上', rulesDishes: '收拾廚房食物、<strong>洗碗</strong>',
+    rulesTwiceWeek: '每週至少 2 次', rulesTrash: '固定<strong>倒垃圾＋回收</strong>',
+    rulesTwiceMonth: '每月至少 2 次', rulesWater: '開車載水桶去<strong>加水</strong>',
+    rulesWed: '每週三', rulesSun: '每週日', rulesCook: '協助煮飯', rulesFeedBird: '固定餵鳥',
+    rulesPenaltyTitle: '未達標罰款',
+    rulesPenaltyHead: '未完成當週目標，需繳費給媽媽',
+    rulesPenaltyDesc: '每少完成 1 區 → 繳交 <strong>500 元</strong><br>例：目標 5 區，完成 3 區 → 繳 <strong>$1,000</strong>',
+    rulesBankTitle: '時間銀行制度',
+    rulesBankHead: '🏦 累積滿 2 小時，隨時可兌換特休',
+    rulesBankHow: '如何累積', rulesBankHowVal: '每區標準 2hr，<strong>超過才存款</strong><br>花 1–2hr → <strong>不存不扣</strong><br>花 2.5hr → 存入 <strong>+0.5hr</strong>',
+    rulesBankExchange: '如何兌換', rulesBankExchangeVal: '累積滿 <strong>+2hr</strong>，<strong>隨時可申請</strong>兌換成特休',
+    rulesBankBenefit: '兌換效益', rulesBankBenefitVal: '每 +2hr → 當週目標 -1 區，只需完成 <strong>4 區</strong>',
+    rulesBankUse: '特休用途', rulesBankUseVal: '不舒服、旅遊均可動用，<strong>跨月不消失</strong>',
+    rulesLeaveTitle: '請假制度',
+    rulesLeaveHead: '每月 3 天免扣假',
+    rulesLeaveDesc: '不舒服可直接申請，<strong>不扣特休</strong><br>超過 3 天從特休扣，特休可<strong>跨月累積</strong>',
+    rulesSalaryTitle: '薪資結構',
+    rulesSalaryLabel: '週薪', rulesSalaryAmt: '$2,500', rulesSalaryUnit: '完成每週 5 個區域可領取',
+    rulesSalaryMonthLabel: '月薪合計', rulesSalaryMonthAmt: '$10,000', rulesSalaryMonthSub: '可抵媽媽每月家用',
+    rulesFooter: '一起把家顧好，也把自己顧好 🌱',
+    // Zone names
+    zoneA: '1樓公共區域', zoneB: '1樓廁所', zoneC: '2樓公共（含曬衣區地板）＋媽媽房',
+    zoneD: '2樓廁所', zoneE: '3樓公共＋臥房', zoneF: '3樓廁所',
+    zoneG: '4樓陽台＋鳥房間', zoneH: '廚房',
+    znA: '一樓公共', znB: '一樓廁所', znC: '二樓公共＋媽媽房', znD: '二樓廁所',
+    znE: '三樓公共＋臥房', znF: '三樓廁所', znG: '四樓陽台＋鳥房', znH: '廚房',
+    zdA: '1樓公共區域', zdB: '1樓廁所', zdC: '含曬衣區地板＋媽媽房間',
+    zdD: '2樓廁所', zdE: '公共＋自己房＋爸爸房', zdF: '3樓廁所',
+    zdG: '地板清水刷洗＋鳥房間', zdH: '整體廚房清潔',
+    zNum: n => `第 ${n} 區`,
+  },
+  en: {
+    title: 'Cleaning Check-in', subtitle: 'Daily Cleaning Tracker',
+    tabCheckin: '📋 Check-in', tabHistory: '📅 History', tabBank: '🏦 Time Bank', tabOverview: '👀 Overview', tabRules: '📖 Rules',
+    thisWeek: 'This Week', daysOff: 'Days Off', weeklyPay: 'Weekly Pay', zones: 'zones', times: 'left',
+    nextZone: 'Next Zone', pending: 'Pending', zoneN: n => `Zone ${n}`,
+    minHours: 'Min 1 hr; 1–2 hr counts as 2 hr (no bank change)',
+    dayOffToday: n => `🏖️ Day Off Today (${n} left)`,
+    roundProgress: 'Round Progress',
+    todayCheckin: "Today's Check-in", dateLabel: '📅 Date', zoneLabel: '🏠 Zone',
+    zoneAutoNote: 'Zones follow order A→H, auto-advances after completion',
+    hoursLabel: '⏱️ Hours Spent', custom: 'Custom:', hourUnit: 'hours',
+    noteLabel: '📝 Notes (optional)', notePlaceholder: 'e.g. Also wiped the walls',
+    submitBtn: '✓ Submit',
+    historyTitle: 'Check-in History', totalN: n => `${n} total`, noRecords: 'No records yet. Go check in! 🌱',
+    bankTitle: 'Current Time Deposit', bankUnit: 'hours (2 hr = 1 day off)', bankNote: 'Redeem anytime after 2 hr, carries over monthly',
+    availDaysOff: 'Available Days Off',
+    freeSub: (f, b) => `${f} free left + ${b} from bank`,
+    usedThisWeek: n => `Used ${n} this week`,
+    freeAndBank: (f, b) => `Free ${f} + Bank ${b}`,
+    applyDayOff: 'Request Day Off',
+    applyDayOffDesc: '<strong style="color:var(--terra);">3 free/month</strong>, then deducted from time bank (2 hr = 1 day)',
+    vacDateLabel: '📅 Date', vacTo: 'to',
+    vacDateNote: 'Start only = 1 day; start & end = consecutive days, auto-assigned to weeks',
+    vacReasonLabel: 'Reason (optional)', vacReasonPlaceholder: 'e.g. Not feeling well, travel',
+    vacSubmit: 'Request Day Off',
+    monthlyBreakdown: 'Monthly Details', noRecordsShort: 'No records yet',
+    dataManage: 'Data Management',
+    exportBackup: '💾 Export Backup', importRestore: '📂 Import Restore',
+    cloudRestore: '☁️ Restore from Cloud',
+    archiveOld: '📦 Archive Old Data (keep 2 months)', clearAll: '🗑️ Clear All Data',
+    ovTotal: 'Total', ovRate: 'Rate', ovStreak: 'Streak', ovUnpaid: 'Unpaid',
+    ovUnpaidTitle: 'Unpaid Fines', ovWeeklyStatus: 'Weekly Status', ovVacLog: 'Day Off History',
+    weeksN: n => `${n} weeks`, noData: 'No data yet', noVacLog: 'No day off records',
+    zoneUnit: 'zones', weekUnit: 'wks',
+    achieved: (done, goal, vac) => `Done! ${done}/${goal} zones${vac ? ` (incl. ${vac} days off)` : ''}`,
+    achievedShort: (done, goal, vac) => `Done ${done}/${goal} zones${vac ? ` (${vac} days off)` : ''}`,
+    inProgress: (done, goal, left) => `In progress ${done}/${goal}, ${left} left`,
+    inProgressShort: (done, goal, left) => `In progress ${done}/${goal}, ${left} left`,
+    notMet: (done, goal, left) => `Not met ${done}/${goal}, ${left} short`,
+    notMetPaid: (done, goal) => `Not met ${done}/${goal}, fine paid`,
+    notMetPaidAmt: (done, goal, amt) => `Not met ${done}/${goal}, paid $${amt}`,
+    notMetOwes: (done, goal, amt) => `Not met ${done}/${goal}, owes $${amt}`,
+    thisWeekBadge: 'This Week', hrTotal: 'hr total',
+    paidLabel: (amt, date) => `✅ Paid $${amt} (${date})`,
+    owesLabel: amt => `⚠️ Owes $${amt} to Mom`,
+    markPaid: 'Mark Paid',
+    completed: (done, goal, left) => `${done}/${goal} zones, ${left} short`,
+    goalReached: 'Goal reached! 🎉', streakN: n => `🔥 ${n}-week streak!`,
+    shortfall: (n, p) => `${n} short → fine $${p}`, payTarget: 'Target $2,500',
+    loading: '— Loading —',
+    balance: 'Balance', zone: 'Zone',
+    actual: (a, r) => `actual ${a}hr, counted ${r}hr`,
+    noVacYet: 'No requests yet',
+    bankN: n => `Bank ${n}`, freeN: n => `Free ${n}`,
+    selectDate: 'Please select a date 📅', enterHours: 'Please enter hours ⏱️',
+    minOneHour: 'Minimum 1 hour to complete a zone',
+    zoneComplete: (z, note) => `Zone ${z} done! ${note}`,
+    countedAs2: '(counted as 2hr)',
+    weekGoalReached: '🎉 Weekly goal reached! Great job!',
+    confirmDelete: 'Delete this record?', deleted: 'Deleted',
+    paidRecorded: amt => `Payment of $${amt} recorded ✅`,
+    vacSelectDate: 'Please select a start date 📅', vacEndBeforeStart: 'End date cannot be before start date',
+    vacDefault: 'Day off',
+    vacApplied1: range => `1 day off applied for ${range} ✅`,
+    vacAppliedN: (n, w) => `${n} days off applied (${w} weeks) ✅`,
+    noDaysOff: 'No days off available 😢',
+    confirmDayOff: (total) => `Take today off?\n(${total} remaining, using 1)`,
+    dayOffSuccess: 'Day off approved! Rest well 🏖️',
+    confirmClearAll: 'Clear all data? This cannot be undone.', cleared: 'All data cleared 🗑️',
+    tooFewRecords: 'Too few records to archive',
+    noOldData: 'No data older than 2 months to archive',
+    archiveMsg: (date, entries, vac, bank) => `Archive data before ${date}:\n• ${entries} check-in records\n• ${vac} day off records\n• Bank hours ${bank}hr carried forward\n\nCannot be undone (backup first). Proceed?`,
+    archived: n => `Archived ${n} old records 📦`,
+    backupDownloaded: 'Backup downloaded',
+    invalidFile: 'Invalid file format ❌', readFailed: 'Failed to read file ❌',
+    confirmRestore: (date, n) => `Restore backup?\n(${date ? 'Date: ' + date : 'Unknown date'}, ${n} records)\n\nThis will overwrite all current data`,
+    restored: 'Restore successful',
+    noCloudBackup: 'No cloud backups found', invalidChoice: 'Invalid selection',
+    cloudRestorePrompt: (options, max) => `Select a cloud backup:\n\n${options}\n\nEnter number (1-${max}):`,
+    cloudRestoreConfirm: date => `Restore backup from ${date}?\n\nThis will overwrite all current data`,
+    cloudRestored: 'Restored from cloud backup',
+    notEnough: (free, bank, need) => `Not enough! ${free} free + ${bank} from bank, need ${need}`,
+    rulesMustOrder: 'Must Follow Order',
+    rulesOrderDesc: 'Zones must be completed in order, <strong>no skipping</strong>. After H, restart from A.',
+    rulesCycle: 'Cycle',
+    rulesZonesTitle: '8 Cleaning Zones',
+    rulesExecTitle: 'Rules',
+    rulesSeqLabel: 'Sequential', rulesSeqValue: 'Complete zones <strong>A→H in order</strong>, progress carries across weeks',
+    rulesGoalLabel: 'Weekly Goal', rulesGoalValue: '<strong>5 zones</strong> per week, <strong>2 hours</strong> standard per zone',
+    rulesHelpLabel: 'Extra Help', rulesHelpValue: '<strong>Proactively ask</strong> Mom if she needs help',
+    rulesCycleLabel: 'Cycle', rulesCycleValue: 'After H, <strong>restart from A</strong>',
+    rulesDailyTitle: 'Daily / Weekly Tasks',
+    rulesEveryNight: 'Every Night', rulesDishes: 'Clean up kitchen, <strong>wash dishes</strong>',
+    rulesTwiceWeek: '2x / Week', rulesTrash: '<strong>Take out trash & recycling</strong>',
+    rulesTwiceMonth: '2x / Month', rulesWater: 'Drive to <strong>refill water</strong>',
+    rulesWed: 'Every Wed', rulesSun: 'Every Sun', rulesCook: 'Help cook', rulesFeedBird: 'Feed birds',
+    rulesPenaltyTitle: 'Penalty for Missing Goal',
+    rulesPenaltyHead: 'Miss weekly goal = pay Mom',
+    rulesPenaltyDesc: 'Each missing zone → <strong>$500 fine</strong><br>e.g. Goal 5, done 3 → pay <strong>$1,000</strong>',
+    rulesBankTitle: 'Time Bank System',
+    rulesBankHead: '🏦 Save 2+ hours to earn days off',
+    rulesBankHow: 'How to Save', rulesBankHowVal: '2hr standard per zone, <strong>only excess is saved</strong><br>1–2hr → <strong>no change</strong><br>2.5hr → save <strong>+0.5hr</strong>',
+    rulesBankExchange: 'How to Redeem', rulesBankExchangeVal: 'At <strong>+2hr</strong>, <strong>redeem anytime</strong> for a day off',
+    rulesBankBenefit: 'Benefit', rulesBankBenefitVal: 'Each +2hr → weekly goal -1, only need <strong>4 zones</strong>',
+    rulesBankUse: 'Day Off Use', rulesBankUseVal: 'Sick or travel, <strong>carries over monthly</strong>',
+    rulesLeaveTitle: 'Leave Policy',
+    rulesLeaveHead: '3 Free Days / Month',
+    rulesLeaveDesc: 'Feel sick? Apply directly, <strong>no deduction</strong><br>After 3, deducted from bank. Bank <strong>carries over</strong>',
+    rulesSalaryTitle: 'Salary',
+    rulesSalaryLabel: 'Weekly', rulesSalaryAmt: '$2,500', rulesSalaryUnit: 'For completing 5 zones/week',
+    rulesSalaryMonthLabel: 'Monthly Total', rulesSalaryMonthAmt: '$10,000', rulesSalaryMonthSub: 'Offsets Mom\'s household expenses',
+    rulesFooter: 'Taking care of home, taking care of ourselves 🌱',
+    zoneA: '1F Common Area', zoneB: '1F Bathroom', zoneC: '2F Common + Mom\'s Room',
+    zoneD: '2F Bathroom', zoneE: '3F Common + Bedrooms', zoneF: '3F Bathroom',
+    zoneG: '4F Balcony + Bird Room', zoneH: 'Kitchen',
+    znA: '1F Common', znB: '1F Bathroom', znC: '2F Common + Mom\'s', znD: '2F Bathroom',
+    znE: '3F Common + Beds', znF: '3F Bathroom', znG: '4F Balcony + Birds', znH: 'Kitchen',
+    zdA: '1F common area', zdB: '1F bathroom', zdC: 'Incl. laundry floor + Mom\'s room',
+    zdD: '2F bathroom', zdE: 'Common + own room + Dad\'s room', zdF: '3F bathroom',
+    zdG: 'Floor scrub + bird room', zdH: 'Full kitchen cleaning',
+    zNum: n => `Zone ${n}`,
+  }
+};
+
+function t(key, ...args) {
+  const v = I18N[LANG]?.[key] ?? I18N.zh[key];
+  return typeof v === 'function' ? v(...args) : v;
+}
+
+function setLang(lang) {
+  LANG = lang;
+  localStorage.setItem('cleaning-lang', lang);
+  // Update URL without reload
+  const url = new URL(location);
+  url.searchParams.set('lang', lang);
+  history.replaceState(null, '', url);
+  applyStaticI18n();
+  render();
+}
+
+function applyStaticI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const val = t(key);
+    if (val != null) {
+      if (el.dataset.i18nHtml) el.innerHTML = val;
+      else el.textContent = val;
+    }
+  });
+  // Update lang toggle button
+  const btn = document.getElementById('lang-toggle');
+  if (btn) btn.textContent = LANG === 'zh' ? '🌐 EN' : '🌐 中文';
+}
+
 // ── CONSTANTS ──────────────────────────────────────────
 const ZONES = {
-  A:{name:'1樓公共區域'},
-  B:{name:'1樓廁所'},
-  C:{name:'2樓公共（含曬衣區地板）＋媽媽房'},
-  D:{name:'2樓廁所'},
-  E:{name:'3樓公共＋臥房'},
-  F:{name:'3樓廁所'},
-  G:{name:'4樓陽台＋鳥房間'},
-  H:{name:'廚房'}
+  A:{get name(){ return t('zoneA'); }},
+  B:{get name(){ return t('zoneB'); }},
+  C:{get name(){ return t('zoneC'); }},
+  D:{get name(){ return t('zoneD'); }},
+  E:{get name(){ return t('zoneE'); }},
+  F:{get name(){ return t('zoneF'); }},
+  G:{get name(){ return t('zoneG'); }},
+  H:{get name(){ return t('zoneH'); }}
 };
 const ZONE_ORDER = ['A','B','C','D','E','F','G','H'];
 const STANDARD = 2;      // standard hours per zone
@@ -798,16 +1082,26 @@ function computeRecordedHours(actual) {
 }
 
 // ── ENCOURAGEMENT ─────────────────────────────────────
-const PRAISE_FAST   = ['效率女王！👑','超快完成！⚡','時間掌控高手✨','閃電打掃！🌟','你也太厲害了吧！'];
-const PRAISE_NORMAL = ['穩紮穩打💪','認真負責！⭐','完美完成🎯','一步一步都很踏實','做得很好！🌿'];
-const PRAISE_EXTRA  = ['超認真！加油💪','謝謝你的用心⭐','媽媽一定很感激🥰','付出都被看見了✨','辛苦了！你最棒🌟'];
+const PRAISE = {
+  zh: {
+    fast:   ['效率女王！👑','超快完成！⚡','時間掌控高手✨','閃電打掃！🌟','你也太厲害了吧！'],
+    normal: ['穩紮穩打💪','認真負責！⭐','完美完成🎯','一步一步都很踏實','做得很好！🌿'],
+    extra:  ['超認真！加油💪','謝謝你的用心⭐','媽媽一定很感激🥰','付出都被看見了✨','辛苦了！你最棒🌟']
+  },
+  en: {
+    fast:   ['Speed queen! 👑','So fast! ⚡','Time master ✨','Lightning clean! 🌟','Amazing! 💫'],
+    normal: ['Steady work 💪','Well done! ⭐','Perfect 🎯','Step by step 🌿','Great job! ✨'],
+    extra:  ['So dedicated! 💪','Thank you! ⭐','Mom appreciates it 🥰','Your effort shows ✨','You\'re the best! 🌟']
+  }
+};
 
 function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 function getPraise(actual) {
-  if (actual < STANDARD) return randomFrom(PRAISE_FAST);
-  if (actual === STANDARD) return randomFrom(PRAISE_NORMAL);
-  return randomFrom(PRAISE_EXTRA);
+  const p = PRAISE[LANG] || PRAISE.zh;
+  if (actual < STANDARD) return randomFrom(p.fast);
+  if (actual === STANDARD) return randomFrom(p.normal);
+  return randomFrom(p.extra);
 }
 
 // ── RENDER ─────────────────────────────────────────────
@@ -822,8 +1116,8 @@ function renderCheckin() {
   const nz = nextZone();
   if (g('nz-letter'))  g('nz-letter').textContent  = nz;
   if (g('nz-name'))    g('nz-name').textContent    = ZONES[nz].name;
-  if (g('nz-desc'))    g('nz-desc').textContent    = '最少 1 小時，1–2hr 計為 2hr（不扣不存）';
-  if (g('nz-badge'))   g('nz-badge').textContent   = `第 ${ZONE_ORDER.indexOf(nz)+1} 區`;
+  if (g('nz-desc'))    g('nz-desc').textContent    = t('minHours');
+  if (g('nz-badge'))   g('nz-badge').textContent   = t('zoneN', ZONE_ORDER.indexOf(nz)+1);
   if (g('locked-zone-display')) g('locked-zone-display').textContent = `${nz}｜${ZONES[nz].name}`;
 
   // Pipeline
@@ -849,25 +1143,25 @@ function renderCheckin() {
   const avail = availableVacation();
   if (g('sb-bank'))     g('sb-bank').innerHTML     = `${avail.total}<span style="font-size:12px;color:rgba(255,255,255,0.35)">次</span>`;
   const vacThisWeek = weekVacationCount(todayKey);
-  if (g('sb-bank-sub')) g('sb-bank-sub').textContent = vacThisWeek ? `本週已用 ${vacThisWeek} 次` : `免費${avail.freeLeft}＋銀行${avail.bankPasses}`;
+  if (g('sb-bank-sub')) g('sb-bank-sub').textContent = vacThisWeek ? t('usedThisWeek', vacThisWeek) : t('freeAndBank', avail.freeLeft, avail.bankPasses);
 
   if (weZones >= goal) {
     if (g('sb-pay'))    { g('sb-pay').textContent = `$${WEEKLY_PAY.toLocaleString()}`; g('sb-pay').style.color = 'var(--gold)'; }
-    if (g('sb-pay-sub'))g('sb-pay-sub').textContent= streak > 1 ? `🔥 連勝 ${streak} 週！` : '目標達成 🎉';
+    if (g('sb-pay-sub'))g('sb-pay-sub').textContent= streak > 1 ? t('streakN', streak) : t('goalReached');
   } else {
     const projectedPay = WEEKLY_PAY - penalty;
     if (g('sb-pay'))    g('sb-pay').textContent    = projectedPay >= 0 ? `$${projectedPay.toLocaleString()}` : `-$${Math.abs(projectedPay).toLocaleString()}`;
     if (g('sb-pay'))    g('sb-pay').style.color    = shortfall > 0 ? '#ffaa80' : 'var(--gold)';
-    if (g('sb-pay-sub'))g('sb-pay-sub').textContent= shortfall > 0 ? `差 ${shortfall} 區 → 罰 $${penalty}` : '目標 $2,500';
+    if (g('sb-pay-sub'))g('sb-pay-sub').textContent= shortfall > 0 ? t('shortfall', shortfall, penalty) : t('payTarget');
   }
 }
 
 function renderHistory() {
   const list = g('history-list');
   if (!list) return;
-  if (g('history-count')) g('history-count').textContent = `共 ${entries.length} 筆`;
+  if (g('history-count')) g('history-count').textContent = t('totalN', entries.length);
   if (!entries.length) {
-    list.innerHTML = '<div class="history-empty">還沒有紀錄，去打第一張卡吧！🌱</div>';
+    list.innerHTML = `<div class="history-empty">${t('noRecords')}</div>`;
     return;
   }
 
@@ -902,19 +1196,19 @@ function renderHistory() {
 
     const statusIcon = achieved ? '✅' : paid ? '💰' : isCurrent ? '⏳' : '⚠️';
     const statusText = achieved
-      ? `達標！${zonesCount}/${goal} 區${vacUsed ? `（含 ${vacUsed} 次特休）` : ''}`
+      ? t('achieved', zonesCount, goal, vacUsed)
       : paid
-        ? `未達標 ${zonesCount}/${goal} 區，已繳罰款`
+        ? t('notMetPaid', zonesCount, goal)
         : isCurrent
-          ? `進行中 ${zonesCount}/${goal} 區，還差 ${shortfall} 區`
-          : `未達標 ${zonesCount}/${goal} 區，差 ${shortfall} 區`;
+          ? t('inProgress', zonesCount, goal, shortfall)
+          : t('notMet', zonesCount, goal, shortfall);
 
     const penaltyHtml = !achieved && !isCurrent
       ? paid
         ? `<div style="margin-top:6px;font-size:12px;font-weight:700;color:var(--sage);">✅ 已繳 $${paid.amount}（${paid.paidDate}）</div>`
         : `<div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;font-weight:700;color:var(--terra);">⚠️ 需繳 $${penalty} 給媽媽</span>
-            <button onclick="markPaid('${wk}',${penalty})" style="padding:3px 12px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">標記已繳</button>
+            <span style="font-size:12px;font-weight:700;color:var(--terra);">${t('owesLabel', penalty)}</span>
+            <button onclick="markPaid('${wk}',${penalty})" style="padding:3px 12px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">${t('markPaid')}</button>
            </div>`
       : '';
 
@@ -957,17 +1251,17 @@ function renderBank() {
   if (g('bh-total'))      g('bh-total').textContent      = `${bank>=0?'+':''}${bank}`;
   const avail = availableVacation();
   if (g('vb-balance'))    g('vb-balance').innerHTML      = `${avail.total} <span style="font-size:16px;font-weight:400;">次</span>`;
-  if (g('vb-free'))       g('vb-free').textContent       = `本月免費剩 ${avail.freeLeft} 次 ＋ 銀行可換 ${avail.bankPasses} 次`;
+  if (g('vb-free'))       g('vb-free').textContent       = t('freeSub', avail.freeLeft, avail.bankPasses);
 
   // Quick vacation button text
   const qb = g('quick-vacation-btn');
-  if (qb) qb.textContent = `🏖️ 今天請假（剩 ${avail.total} 次）`;
+  if (qb) qb.textContent = t('dayOffToday', avail.total);
 
   // Entries breakdown
   const ml = g('month-list');
   if (ml) {
     if (!entries.length) {
-      ml.innerHTML = '<div class="history-empty">還沒有紀錄</div>';
+      ml.innerHTML = `<div class="history-empty">${t('noRecordsShort')}</div>`;
     } else {
       const sorted = [...entries].sort((a,b) => new Date(b.date)-new Date(a.date));
       const oldToNew = [...entries].sort((a,b) => new Date(a.date)-new Date(b.date));
@@ -1003,7 +1297,7 @@ function renderBank() {
   const vl = g('vacation-log');
   if (vl) {
     vl.innerHTML = !vacationLogs.length
-      ? '<div style="font-size:12px;color:var(--sage);padding:12px 0;text-align:center;">尚無申請紀錄</div>'
+      ? `<div style="font-size:12px;color:var(--sage);padding:12px 0;text-align:center;">${t('noVacYet')}</div>`
       : [...vacationLogs].reverse().map(v => {
           const wkRange = formatWeekRange(weekKey(v.date));
           const src = v.fromBank > 0 ? `銀行${v.fromBank}次` : '';
@@ -1020,8 +1314,8 @@ function renderBank() {
 
 function renderOverview() {
   if (!entries.length) {
-    if (g('ov-weeks')) g('ov-weeks').innerHTML = '<div class="history-empty">還沒有資料</div>';
-    if (g('ov-vacation')) g('ov-vacation').innerHTML = '<div class="history-empty">尚無特休紀錄</div>';
+    if (g('ov-weeks')) g('ov-weeks').innerHTML = `<div class="history-empty">${t('noData')}</div>`;
+    if (g('ov-vacation')) g('ov-vacation').innerHTML = `<div class="history-empty">${t('noVacLog')}</div>`;
     return;
   }
 
@@ -1063,16 +1357,16 @@ function renderOverview() {
     let icon, bg, statusText;
     if (achieved) {
       icon = '✅'; bg = 'var(--ls)';
-      statusText = `達標 ${zonesCount}/${goal} 區${vacUsed ? `（特休 ${vacUsed} 次）` : ''}`;
+      statusText = t('achievedShort', zonesCount, goal, vacUsed);
     } else if (isCurrent) {
       icon = '⏳'; bg = 'var(--lg)';
-      statusText = `進行中 ${zonesCount}/${goal} 區，差 ${shortfall} 區`;
+      statusText = t('inProgressShort', zonesCount, goal, shortfall);
     } else if (paid) {
       icon = '💰'; bg = 'var(--lg)';
-      statusText = `未達標 ${zonesCount}/${goal}，已繳 $${paid.amount}`;
+      statusText = t('notMetPaidAmt', zonesCount, goal, paid.amount);
     } else {
       icon = '⚠️'; bg = 'var(--lr)';
-      statusText = `未達標 ${zonesCount}/${goal}，需繳 $${penalty}`;
+      statusText = t('notMetOwes', zonesCount, goal, penalty);
     }
 
     weekRows.push(`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--warm);">
@@ -1110,10 +1404,10 @@ function renderOverview() {
         `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--warm);">
           <div style="flex:1;">
             <div style="font-size:13px;font-weight:600;color:var(--terra);">${formatWeekRange(u.wk)}</div>
-            <div style="font-size:11px;color:var(--sage);">完成 ${u.zonesCount}/${u.goal} 區，差 ${u.shortfall} 區</div>
+            <div style="font-size:11px;color:var(--sage);">${t('completed', u.zonesCount, u.goal, u.shortfall)}</div>
           </div>
           <div style="font-family:'Noto Serif TC',serif;font-size:16px;font-weight:700;color:var(--terra);">$${u.penalty}</div>
-          <button onclick="markPaid('${u.wk}',${u.penalty})" style="padding:5px 14px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">標記已繳</button>
+          <button onclick="markPaid('${u.wk}',${u.penalty})" style="padding:5px 14px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">${t('markPaid')}</button>
         </div>`
       ).join('');
     } else {
@@ -1122,13 +1416,13 @@ function renderOverview() {
   }
 
   // Week list
-  if (g('ov-week-count')) g('ov-week-count').textContent = `共 ${weekList.length} 週`;
-  if (g('ov-weeks')) g('ov-weeks').innerHTML = weekRows.join('') || '<div class="history-empty">還沒有資料</div>';
+  if (g('ov-week-count')) g('ov-week-count').textContent = t('weeksN', weekList.length);
+  if (g('ov-weeks')) g('ov-weeks').innerHTML = weekRows.join('') || `<div class="history-empty">${t('noData')}</div>`;
 
   // Vacation log
   if (g('ov-vacation')) {
     g('ov-vacation').innerHTML = !vacationLogs.length
-      ? '<div class="history-empty">尚無特休紀錄</div>'
+      ? `<div class="history-empty">${t('noVacLog')}</div>`
       : [...vacationLogs].reverse().map(v => {
           const wkRange = formatWeekRange(weekKey(v.date));
           const src = v.fromBank > 0 ? `銀行${v.fromBank}次` : '';
@@ -1153,9 +1447,9 @@ function submitEntry() {
   const note  = g('input-note') ? g('input-note').value.trim() : '';
   const zone  = nextZone();
 
-  if (!date)              { toast('請選擇日期 📅'); return; }
-  if (!actual || actual <= 0) { toast('請輸入花費時間 ⏱️'); return; }
-  if (actual < 1)         { toast('最少需要 1 小時才算完成一個區域'); return; }
+  if (!date)              { toast(t('selectDate')); return; }
+  if (!actual || actual <= 0) { toast(t('enterHours')); return; }
+  if (actual < 1)         { toast(t('minOneHour')); return; }
 
   const recorded = computeRecordedHours(actual);
 
@@ -1167,30 +1461,30 @@ function submitEntry() {
   clearHourBtns();
 
   const praise = getPraise(actual);
-  const countedNote = actual < STANDARD ? `（計為 2hr）` : '';
-  toast(`${zone} 區完成！${countedNote} ${praise}`);
+  const countedNote = actual < STANDARD ? t('countedAs2') : '';
+  toast(t('zoneComplete', zone, countedNote) + ' ' + praise);
 
   // Celebrate if weekly goal just hit
   const todayKey = weekKey(date);
   const weZones = entries.filter(e => weekKey(e.date) === todayKey).length;
   if (weZones === effectiveGoal(todayKey)) {
-    setTimeout(() => toast('🎉 本週目標達成！太棒了！'), 2800);
+    setTimeout(() => toast(t('weekGoalReached')), 2800);
   }
 
   render();
 }
 
 function deleteEntry(id) {
-  if (!confirm('確定要刪除這筆紀錄嗎？')) return;
+  if (!confirm(t('confirmDelete'))) return;
   entries = entries.filter(e => e.id !== id);
-  save(); render(); toast('已刪除');
+  save(); render(); toast(t('deleted'));
 }
 
 function markPaid(wk, amount) {
   if (penaltyPaid.find(p => p.weekKey === wk)) return;
   const today = new Date();
   penaltyPaid.push({ id: Date.now().toString(), weekKey: wk, amount, paidDate: `${today.getMonth()+1}/${today.getDate()}` });
-  save(); render(); toast(`已記錄繳款 $${amount} ✅`);
+  save(); render(); toast(t('paidRecorded', amount));
 }
 
 function applyVacation(startDate, endDate, reason) {
@@ -1214,7 +1508,7 @@ function applyVacation(startDate, endDate, reason) {
   const bankAvailable = Math.floor(currentBank() / STANDARD);
 
   if (fromBank > bankAvailable) {
-    toast(`不夠！免費剩 ${freeLeft} 次，銀行可換 ${bankAvailable} 次，共需 ${totalCount} 次`);
+    toast(t('notEnough', freeLeft, bankAvailable, totalCount));
     return false;
   }
 
@@ -1246,11 +1540,11 @@ function useVacation() {
   const startDate = g('vacation-start') ? g('vacation-start').value : '';
   const endDate = g('vacation-end') ? g('vacation-end').value : '';
   const reason = g('vacation-reason') ? g('vacation-reason').value.trim() : '';
-  if (!startDate) { toast('請選擇開始日期 📅'); return; }
+  if (!startDate) { toast(t('vacSelectDate')); return; }
   const end = endDate || startDate;
-  if (end < startDate) { toast('結束日期不能早於開始日期'); return; }
+  if (end < startDate) { toast(t('vacEndBeforeStart')); return; }
 
-  const result = applyVacation(startDate, end, reason || '請假');
+  const result = applyVacation(startDate, end, reason || t('vacDefault'));
   if (!result) return;
 
   if (g('vacation-start')) g('vacation-start').value = '';
@@ -1259,31 +1553,31 @@ function useVacation() {
 
   if (result.totalCount === 1) {
     const wkRange = formatWeekRange(weekKey(startDate));
-    toast(`已申請 1 次特休，套用於 ${wkRange} ✅`);
+    toast(t('vacApplied1', wkRange));
   } else {
-    toast(`已申請 ${result.totalCount} 天特休（跨 ${result.weeks} 週）✅`);
+    toast(t('vacAppliedN', result.totalCount, result.weeks));
   }
 }
 
 function quickVacationToday() {
   const avail = availableVacation();
-  if (avail.total <= 0) { toast('沒有可用特休了 😢'); return; }
+  if (avail.total <= 0) { toast(t('noDaysOff')); return; }
   const today = new Date().toISOString().slice(0,10);
-  if (!confirm(`確定要申請今天請假嗎？\n（剩餘 ${avail.total} 次，用掉 1 次）`)) return;
-  const result = applyVacation(today, today, '今天請假');
-  if (result) toast('今天請假成功！好好休息 🏖️');
+  if (!confirm(t('confirmDayOff', avail.total))) return;
+  const result = applyVacation(today, today, t('vacDefault'));
+  if (result) toast(t('dayOffSuccess'));
 }
 
 function resetAll() {
-  if (!confirm('確定要清空所有資料？無法復原。')) return;
+  if (!confirm(t('confirmClearAll'))) return;
   entries = []; vacationLogs = []; penaltyPaid = []; monthlyPasses = {};
   bankCarryForward = 0; archivedStats = { zones: 0, weeks: 0, metWeeks: 0 };
-  save(); render(); toast('已清空 🗑️');
+  save(); render(); toast(t('cleared'));
 }
 
 // ── ARCHIVE ────────────────────────────────────────────
 function archiveOld() {
-  if (entries.length < 10) { toast('紀錄太少，不需要歸檔'); return; }
+  if (entries.length < 10) { toast(t('tooFewRecords')); return; }
 
   // Keep recent 2 months, archive the rest
   const cutoff = new Date();
@@ -1294,7 +1588,7 @@ function archiveOld() {
   const oldEntries = entries.filter(e => e.date < cutoffStr);
   const keepEntries = entries.filter(e => e.date >= cutoffStr);
 
-  if (!oldEntries.length) { toast('近 2 個月內沒有可歸檔的舊資料'); return; }
+  if (!oldEntries.length) { toast(t('noOldData')); return; }
 
   // Calculate stats from old entries
   const oldBankContrib = +oldEntries.reduce((s,e) => +(s + (e.recordedHours - STANDARD)).toFixed(1), 0).toFixed(1);
@@ -1316,11 +1610,7 @@ function archiveOld() {
   const oldPenalty = penaltyPaid.filter(p => p.weekKey < cutoffStr);
   const keepPenalty = penaltyPaid.filter(p => p.weekKey >= cutoffStr);
 
-  const msg = `將歸檔 ${cutoffStr} 之前的資料：\n` +
-    `• ${oldEntries.length} 筆打卡紀錄\n` +
-    `• ${oldVacLogs.length} 筆特休紀錄\n` +
-    `• 銀行時數 ${oldBankContrib >= 0 ? '+' : ''}${oldBankContrib}hr 轉入累計\n\n` +
-    `歸檔後無法復原（建議先備份）。確定嗎？`;
+  const msg = t('archiveMsg', cutoffStr, oldEntries.length, oldVacLogs.length, `${oldBankContrib >= 0 ? '+' : ''}${oldBankContrib}`);
 
   if (!confirm(msg)) return;
 
@@ -1334,7 +1624,7 @@ function archiveOld() {
   penaltyPaid = keepPenalty;
 
   save(); render();
-  toast(`已歸檔 ${oldEntries.length} 筆舊資料 📦`);
+  toast(t('archived', oldEntries.length));
 }
 
 // ── BACKUP & RESTORE ───────────────────────────────────
@@ -1349,7 +1639,7 @@ function exportBackup() {
   a.download = `cleaning-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  toast('備份檔已下載');
+  toast(t('backupDownloaded'));
 }
 
 function importBackup() {
@@ -1364,9 +1654,9 @@ function importBackup() {
       try {
         const data = JSON.parse(ev.target.result);
         if (!data.entries || !Array.isArray(data.entries)) {
-          toast('檔案格式不正確 ❌'); return;
+          toast(t('invalidFile')); return;
         }
-        if (!confirm(`確定要還原備份嗎？\n（${data._backupDate ? '備份日期：' + data._backupDate.slice(0,10) : '未知日期'}，${data.entries.length} 筆紀錄）\n\n會覆蓋目前所有資料`)) return;
+        if (!confirm(t('confirmRestore', data._backupDate ? data._backupDate.slice(0,10) : null, data.entries.length))) return;
         entries          = data.entries          || [];
         vacationLogs     = data.vacationLogs     || [];
         penaltyPaid      = data.penaltyPaid      || [];
@@ -1374,9 +1664,9 @@ function importBackup() {
         bankCarryForward = data.bankCarryForward || 0;
         archivedStats    = data.archivedStats    || { zones: 0, weeks: 0, metWeeks: 0 };
         save(); render();
-        toast('還原成功');
+        toast(t('restored'));
       } catch(err) {
-        toast('檔案讀取失敗 ❌');
+        toast(t('readFailed'));
       }
     };
     reader.readAsText(file);
@@ -1387,19 +1677,19 @@ function importBackup() {
 function restoreFromCloud() {
   db.ref('backups').once('value', (snap) => {
     const all = snap.val();
-    if (!all) { toast('沒有雲端備份'); return; }
+    if (!all) { toast(t('noCloudBackup')); return; }
     const keys = Object.keys(all).sort().reverse();
     const options = keys.map((k, i) => {
       const b = all[k];
       const date = b._backupDate ? b._backupDate.slice(0, 10) : k;
-      return `${i + 1}. ${date}（${(b.entries || []).length} 筆紀錄）`;
+      return `${i + 1}. ${date} (${(b.entries || []).length} records)`;
     }).join('\n');
-    const choice = prompt(`選擇要還原的雲端備份：\n\n${options}\n\n輸入數字（1-${keys.length}）：`);
+    const choice = prompt(t('cloudRestorePrompt', options, keys.length));
     if (!choice) return;
     const idx = parseInt(choice) - 1;
-    if (idx < 0 || idx >= keys.length) { toast('無效的選擇'); return; }
+    if (idx < 0 || idx >= keys.length) { toast(t('invalidChoice')); return; }
     const data = all[keys[idx]];
-    if (!confirm(`確定要還原 ${data._backupDate ? data._backupDate.slice(0, 10) : keys[idx]} 的備份嗎？\n\n會覆蓋目前所有資料`)) return;
+    if (!confirm(t('cloudRestoreConfirm', data._backupDate ? data._backupDate.slice(0, 10) : keys[idx]))) return;
     entries          = data.entries          || [];
     vacationLogs     = data.vacationLogs     || [];
     penaltyPaid      = data.penaltyPaid      || [];
@@ -1407,7 +1697,7 @@ function restoreFromCloud() {
     bankCarryForward = data.bankCarryForward || 0;
     archivedStats    = data.archivedStats    || { zones: 0, weeks: 0, metWeeks: 0 };
     save(); render();
-    toast('已從雲端備份還原');
+    toast(t('cloudRestored'));
   });
 }
 
@@ -1447,6 +1737,7 @@ function setToday() {
 
 // ── INIT ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  applyStaticI18n();
   setToday();
   load();
 });
