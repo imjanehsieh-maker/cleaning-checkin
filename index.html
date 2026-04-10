@@ -238,19 +238,19 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
       <div class="sb-item">
         <div class="sb-label" data-i18n="thisWeek">本週完成</div>
         <div class="sb-value" id="sb-zones">0<span style="font-size:13px;color:rgba(255,255,255,0.35)">/5</span></div>
-        <div class="sb-sub">個區域</div>
+        <div class="sb-sub" data-i18n="zones">個區域</div>
       </div>
       <div class="sb-divider"></div>
       <div class="sb-item">
         <div class="sb-label" data-i18n="daysOff">特休餘額</div>
-        <div class="sb-value" id="sb-bank">0<span style="font-size:12px;color:rgba(255,255,255,0.35)">次</span></div>
-        <div class="sb-sub" id="sb-bank-sub">免費+銀行可換</div>
+        <div class="sb-value" id="sb-bank">0<span style="font-size:12px;color:rgba(255,255,255,0.35)" data-i18n="times">次</span></div>
+        <div class="sb-sub" id="sb-bank-sub" data-i18n="freeAndBank" data-i18n-arg="">免費+銀行可換</div>
       </div>
       <div class="sb-divider"></div>
       <div class="sb-item">
         <div class="sb-label" data-i18n="weeklyPay">本週薪資</div>
         <div class="sb-value" id="sb-pay" style="color:var(--gold);">$0</div>
-        <div class="sb-sub" id="sb-pay-sub">目標 $2,500</div>
+        <div class="sb-sub" id="sb-pay-sub" data-i18n="payTarget">目標 $2,500</div>
       </div>
     </div>
 
@@ -293,7 +293,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
       <div class="form-row">
         <label class="form-label" data-i18n="zoneLabel">🏠 打卡區域</label>
         <div style="padding:12px 14px;background:var(--lg);border-radius:10px;border:1.5px solid var(--gold);font-size:14px;color:var(--brown);font-weight:600;" id="locked-zone-display">
-          — 載入中 —
+          <span data-i18n="loading">— 載入中 —</span>
         </div>
         <div style="font-size:11px;color:var(--sage);margin-top:6px;" data-i18n="zoneAutoNote">區域依順序執行，完成後自動更新至下一區</div>
       </div>
@@ -1143,7 +1143,7 @@ function renderCheckin() {
   if (g('sb-zones'))    g('sb-zones').innerHTML    = `${weZones}<span style="font-size:13px;color:rgba(255,255,255,0.35)">/${goal}</span>`;
 
   const avail = availableVacation();
-  if (g('sb-bank'))     g('sb-bank').innerHTML     = `${avail.total}<span style="font-size:12px;color:rgba(255,255,255,0.35)">次</span>`;
+  if (g('sb-bank'))     g('sb-bank').innerHTML     = `${avail.total}<span style="font-size:12px;color:rgba(255,255,255,0.35)">${t('times')}</span>`;
   const vacThisWeek = weekVacationCount(todayKey);
   if (g('sb-bank-sub')) g('sb-bank-sub').textContent = vacThisWeek ? t('usedThisWeek', vacThisWeek) : t('freeAndBank', avail.freeLeft, avail.bankPasses);
 
@@ -1207,7 +1207,7 @@ function renderHistory() {
 
     const penaltyHtml = !achieved && !isCurrent
       ? paid
-        ? `<div style="margin-top:6px;font-size:12px;font-weight:700;color:var(--sage);">✅ 已繳 $${paid.amount}（${paid.paidDate}）</div>`
+        ? `<div style="margin-top:6px;font-size:12px;font-weight:700;color:var(--sage);">${t('paidLabel', paid.amount, paid.paidDate)}</div>`
         : `<div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
             <span style="font-size:12px;font-weight:700;color:var(--terra);">${t('owesLabel', penalty)}</span>
             ${ROLE==='admin'?`<button onclick="markPaid('${wk}',${penalty})" style="padding:3px 12px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">${t('markPaid')}</button>`:''}
@@ -1219,7 +1219,7 @@ function renderHistory() {
       const diffColor = diff >= 0 ? 'var(--sage)' : 'var(--terra)';
       const d = new Date(e.date + 'T00:00:00');
       const counted = e.actualHours !== e.recordedHours
-        ? `<span style="color:var(--gold);font-size:9px;"> (計 ${e.recordedHours}hr)</span>` : '';
+        ? `<span style="color:var(--gold);font-size:9px;"> (${t('countedAs2')})</span>` : '';
       return `<div class="entry-item" style="padding:10px 0;">
         <div class="entry-zone" style="width:36px;height:36px;font-size:15px;">${e.zone}</div>
         <div class="entry-info">
@@ -1237,8 +1237,8 @@ function renderHistory() {
     return `<div style="margin-bottom:16px;border-radius:12px;border:1.5px solid;overflow:hidden;${headerBg}">
       <div style="padding:12px 16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
-          <div style="font-family:'Noto Serif TC',serif;font-size:13px;font-weight:700;color:var(--brown);">${statusIcon} ${formatWeekRange(wk)}${isCurrent?' <span style="font-size:10px;background:var(--terra);color:white;border-radius:10px;padding:1px 8px;">本週</span>':''}</div>
-          <div style="font-size:11px;color:var(--sage);">${totalHours}hr 合計</div>
+          <div style="font-family:'Noto Serif TC',serif;font-size:13px;font-weight:700;color:var(--brown);">${statusIcon} ${formatWeekRange(wk)}${isCurrent?' <span style="font-size:10px;background:var(--terra);color:white;border-radius:10px;padding:1px 8px;">${t('thisWeekBadge')}</span>':''}</div>
+          <div style="font-size:11px;color:var(--sage);">${totalHours} ${t('hrTotal')}</div>
         </div>
         <div style="font-size:12px;color:var(--brown);">${statusText}</div>
         ${penaltyHtml}
@@ -1252,7 +1252,7 @@ function renderBank() {
   const bank = currentBank();
   if (g('bh-total'))      g('bh-total').textContent      = `${bank>=0?'+':''}${bank}`;
   const avail = availableVacation();
-  if (g('vb-balance'))    g('vb-balance').innerHTML      = `${avail.total} <span style="font-size:16px;font-weight:400;">次</span>`;
+  if (g('vb-balance'))    g('vb-balance').innerHTML      = `${avail.total} <span style="font-size:16px;font-weight:400;">${t('times')}</span>`;
   if (g('vb-free'))       g('vb-free').textContent       = t('freeSub', avail.freeLeft, avail.bankPasses);
 
   // Quick vacation button text
@@ -1279,15 +1279,15 @@ function renderBank() {
         const d = new Date(e.date + 'T00:00:00');
         const bal = runningMap[e.id];
         const diffColor = diff >= 0 ? 'var(--sage)' : 'var(--terra)';
-        const counted = e.actualHours !== e.recordedHours ? ` (實際 ${e.actualHours}hr，計 ${e.recordedHours}hr)` : `${e.actualHours}hr`;
+        const counted = e.actualHours !== e.recordedHours ? ` (${t('actual', e.actualHours, e.recordedHours)})` : `${e.actualHours}hr`;
         return `<div class="month-item" style="align-items:flex-start;">
           <div class="mi-month" style="font-size:11px;color:var(--sage);min-width:42px;">${d.getMonth()+1}/${d.getDate()}</div>
           <div class="mi-info">
-            <div class="mi-zones">${e.zone} 區・${counted}</div>
+            <div class="mi-zones">${t('zone')} ${e.zone}・${counted}</div>
             <div class="mi-bank" style="color:${diffColor};">${diff>=0?'+':''}${diff}hr</div>
           </div>
           <div style="text-align:right;font-size:11px;">
-            <div style="color:var(--sage);">餘額</div>
+            <div style="color:var(--sage);">${t('balance')}</div>
             <div style="font-weight:700;color:${bal>=0?'var(--brown)':'var(--terra)'};">${bal>=0?'+':''}${bal}hr</div>
           </div>
         </div>`;
@@ -1302,9 +1302,9 @@ function renderBank() {
       ? `<div style="font-size:12px;color:var(--sage);padding:12px 0;text-align:center;">${t('noVacYet')}</div>`
       : [...vacationLogs].reverse().map(v => {
           const wkRange = formatWeekRange(weekKey(v.date));
-          const src = v.fromBank > 0 ? `銀行${v.fromBank}次` : '';
-          const free = v.fromFree > 0 ? `免費${v.fromFree}次` : '';
-          const tag = [free, src].filter(Boolean).join('＋');
+          const src = v.fromBank > 0 ? t('bankN', v.fromBank) : '';
+          const free = v.fromFree > 0 ? t('freeN', v.fromFree) : '';
+          const tag = [free, src].filter(Boolean).join(' + ');
           return `<div class="vl-item">
             <span class="vl-date" style="min-width:90px;">${wkRange}</span>
             <span class="vl-desc">${v.reason} <span style="color:var(--sage);font-size:10px;">${tag}</span></span>
@@ -1374,7 +1374,7 @@ function renderOverview() {
     weekRows.push(`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--warm);">
       <div style="font-size:18px;flex-shrink:0;">${icon}</div>
       <div style="flex:1;">
-        <div style="font-size:13px;font-weight:600;color:var(--brown);">${formatWeekRange(wk)}${isCurrent?' <span style="font-size:10px;background:var(--terra);color:white;border-radius:10px;padding:1px 8px;">本週</span>':''}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--brown);">${formatWeekRange(wk)}${isCurrent?' <span style="font-size:10px;background:var(--terra);color:white;border-radius:10px;padding:1px 8px;">${t('thisWeekBadge')}</span>':''}</div>
         <div style="font-size:11px;color:var(--sage);margin-top:2px;">${statusText}</div>
       </div>
     </div>`);
@@ -1384,14 +1384,14 @@ function renderOverview() {
   const grandZones = entries.length + archivedStats.zones;
   const grandWeeks = totalWeeks + archivedStats.weeks;
   const grandMet = metWeeks + archivedStats.metWeeks;
-  if (g('ov-total')) g('ov-total').innerHTML = `${grandZones}<span style="font-size:12px;color:rgba(255,255,255,0.35)">區</span>`;
+  if (g('ov-total')) g('ov-total').innerHTML = `${grandZones}<span style="font-size:12px;color:rgba(255,255,255,0.35)">${t('zoneUnit')}</span>`;
   if (g('ov-rate')) {
     const rate = grandWeeks > 0 ? Math.round(grandMet / grandWeeks * 100) : 0;
     g('ov-rate').innerHTML = grandWeeks > 0
       ? `${rate}<span style="font-size:12px;color:rgba(255,255,255,0.35)">%</span>`
       : '—';
   }
-  if (g('ov-streak')) g('ov-streak').innerHTML = `${consecutiveWeeks()}<span style="font-size:12px;color:rgba(255,255,255,0.35)">週</span>`;
+  if (g('ov-streak')) g('ov-streak').innerHTML = `${consecutiveWeeks()}<span style="font-size:12px;color:rgba(255,255,255,0.35)">${t('weekUnit')}</span>`;
   if (g('ov-unpaid')) {
     g('ov-unpaid').textContent = totalUnpaid > 0 ? `$${totalUnpaid.toLocaleString()}` : '$0';
     g('ov-unpaid').style.color = totalUnpaid > 0 ? '#ffaa80' : 'var(--gold)';
@@ -1427,9 +1427,9 @@ function renderOverview() {
       ? `<div class="history-empty">${t('noVacLog')}</div>`
       : [...vacationLogs].reverse().map(v => {
           const wkRange = formatWeekRange(weekKey(v.date));
-          const src = v.fromBank > 0 ? `銀行${v.fromBank}次` : '';
-          const free = v.fromFree > 0 ? `免費${v.fromFree}次` : '';
-          const tag = [free, src].filter(Boolean).join('＋');
+          const src = v.fromBank > 0 ? t('bankN', v.fromBank) : '';
+          const free = v.fromFree > 0 ? t('freeN', v.fromFree) : '';
+          const tag = [free, src].filter(Boolean).join(' + ');
           return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--warm);">
             <div style="font-size:14px;flex-shrink:0;">🏖️</div>
             <div style="flex:1;">
