@@ -270,7 +270,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     </div>
 
     <!-- QUICK VACATION -->
-    <button onclick="quickVacationToday()" style="width:100%;padding:13px;background:var(--ls);border:1.5px solid var(--sage);border-radius:12px;color:var(--brown);font-family:'Noto Serif TC',serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all 0.2s;margin-bottom:16px;" id="quick-vacation-btn">🏖️ 今天請假</button>
+    <button data-admin onclick="quickVacationToday()" style="width:100%;padding:13px;background:var(--ls);border:1.5px solid var(--sage);border-radius:12px;color:var(--brown);font-family:'Noto Serif TC',serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all 0.2s;margin-bottom:16px;" id="quick-vacation-btn">🏖️ 今天請假</button>
 
     <!-- PIPELINE -->
     <div class="card" style="padding:14px 16px;">
@@ -279,7 +279,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     </div>
 
     <!-- CHECKIN FORM -->
-    <div class="card">
+    <div class="card" data-admin>
       <div class="card-title">
         <div class="card-dot"></div>
         <h2 data-i18n="todayCheckin">今日打卡</h2>
@@ -357,7 +357,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     </div>
 
     <!-- USE VACATION -->
-    <div class="card">
+    <div class="card" data-admin>
       <div class="card-title">
         <div class="card-dot"></div>
         <h2 data-i18n="applyDayOff">申請特休</h2>
@@ -393,7 +393,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     </div>
 
     <!-- DATA MANAGEMENT -->
-    <div class="card" style="border-color:var(--warm);">
+    <div class="card" data-admin style="border-color:var(--warm);">
       <div class="card-title">
         <div class="card-dot" style="background:var(--sage);"></div>
         <h2 data-i18n="dataManage">資料管理</h2>
@@ -587,6 +587,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
 
 // ── i18n ──────────────────────────────────────────────
 let LANG = new URLSearchParams(location.search).get('lang') || localStorage.getItem('cleaning-lang') || 'zh';
+const ROLE = new URLSearchParams(location.search).get('role') || 'family'; // 預設家人模式，只有 ?role=admin 才是管理員
 
 const I18N = {
   zh: {
@@ -1209,7 +1210,7 @@ function renderHistory() {
         ? `<div style="margin-top:6px;font-size:12px;font-weight:700;color:var(--sage);">✅ 已繳 $${paid.amount}（${paid.paidDate}）</div>`
         : `<div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
             <span style="font-size:12px;font-weight:700;color:var(--terra);">${t('owesLabel', penalty)}</span>
-            <button onclick="markPaid('${wk}',${penalty})" style="padding:3px 12px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">${t('markPaid')}</button>
+            ${ROLE==='admin'?`<button onclick="markPaid('${wk}',${penalty})" style="padding:3px 12px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">${t('markPaid')}</button>`:''}
            </div>`
       : '';
 
@@ -1229,7 +1230,7 @@ function renderHistory() {
           <div class="entry-hours" style="font-size:14px;">${e.actualHours}<span>hr</span>${counted}</div>
           <div style="font-size:10px;color:${diffColor};text-align:right;">${diff>=0?'+':''}${diff}hr</div>
         </div>
-        <button class="delete-btn" onclick="deleteEntry('${e.id}')">✕</button>
+        ${ROLE==='admin'?`<button class="delete-btn" onclick="deleteEntry('${e.id}')">✕</button>`:''}
       </div>`;
     }).join('');
 
@@ -1408,7 +1409,7 @@ function renderOverview() {
             <div style="font-size:11px;color:var(--sage);">${t('completed', u.zonesCount, u.goal, u.shortfall)}</div>
           </div>
           <div style="font-family:'Noto Serif TC',serif;font-size:16px;font-weight:700;color:var(--terra);">$${u.penalty}</div>
-          <button onclick="markPaid('${u.wk}',${u.penalty})" style="padding:5px 14px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">${t('markPaid')}</button>
+          ${ROLE==='admin'?`<button onclick="markPaid('${u.wk}',${u.penalty})" style="padding:5px 14px;background:var(--terra);border:none;border-radius:20px;color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">${t('markPaid')}</button>`:''}
         </div>`
       ).join('');
     } else {
@@ -1739,9 +1740,16 @@ function setToday() {
 // ── INIT ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   applyStaticI18n();
+  applyRole();
   setToday();
   load();
 });
+
+function applyRole() {
+  if (ROLE === 'admin') return; // 管理員看到全部
+  // 家人模式：隱藏危險操作
+  document.querySelectorAll('[data-admin]').forEach(el => el.style.display = 'none');
+}
 </script>
 </body>
 </html>
