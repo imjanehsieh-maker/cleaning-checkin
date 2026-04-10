@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>妹妹打掃打卡系統</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBNp3dlB-UzkJ1cFZGbLvKr7wY9U1PtVE8",
+  authDomain: "cleaning-checkin-sys.firebaseapp.com",
+  databaseURL: "https://cleaning-checkin-sys-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "cleaning-checkin-sys",
+  appId: "1:253221567690:web:cead592e7929f9858a4833"
+});
+const db = firebase.database();
+const dataRef = db.ref('cleaning-v4');
+</script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
@@ -596,8 +609,11 @@ let monthlyPasses = {}; // {"2025-04": usedCount}
 let bankCarryForward = 0; // archived bank hours from old entries
 let archivedStats = { zones: 0, weeks: 0, metWeeks: 0 }; // archived summary
 
-// ── STORAGE ────────────────────────────────────────────
+// ── STORAGE (Firebase Realtime Database + localStorage fallback) ──
+let firebaseReady = false;
+
 function load() {
+  // 先從 localStorage 載入（離線時也能用）
   try {
     const d = JSON.parse(localStorage.getItem('cleaning-v4') || 'null');
     if (d) {
@@ -610,12 +626,31 @@ function load() {
     }
   } catch(e) {}
   render();
+
+  // Firebase 即時同步：別人改了資料，這邊也會自動更新
+  dataRef.on('value', (snapshot) => {
+    const d = snapshot.val();
+    if (d) {
+      entries          = d.entries          || [];
+      vacationLogs     = d.vacationLogs     || [];
+      penaltyPaid      = d.penaltyPaid      || [];
+      monthlyPasses    = d.monthlyPasses    || {};
+      bankCarryForward = d.bankCarryForward || 0;
+      archivedStats    = d.archivedStats    || { zones: 0, weeks: 0, metWeeks: 0 };
+      // 同步到 localStorage 當離線備份
+      localStorage.setItem('cleaning-v4', JSON.stringify(d));
+      render();
+    }
+    firebaseReady = true;
+  });
 }
 
 function save() {
-  localStorage.setItem('cleaning-v4', JSON.stringify(
-    {entries, vacationLogs, penaltyPaid, monthlyPasses, bankCarryForward, archivedStats}
-  ));
+  const data = {entries, vacationLogs, penaltyPaid, monthlyPasses, bankCarryForward, archivedStats};
+  // 寫入 localStorage（即時）
+  localStorage.setItem('cleaning-v4', JSON.stringify(data));
+  // 寫入 Firebase（同步到雲端）
+  dataRef.set(data).catch(e => console.warn('Firebase save failed:', e));
 }
 
 // ── HELPERS ────────────────────────────────────────────
@@ -1265,7 +1300,7 @@ function archiveOld() {
 
 // ── BACKUP & RESTORE ───────────────────────────────────
 function exportBackup() {
-  const data = JSON.parse(localStorage.getItem('cleaning-v4') || '{}');
+  const data = {entries, vacationLogs, penaltyPaid, monthlyPasses, bankCarryForward, archivedStats};
   data._backupDate = new Date().toISOString();
   data._version = 'v4';
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1275,7 +1310,7 @@ function exportBackup() {
   a.download = `cleaning-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  toast('備份檔已下載 💾');
+  toast('備份檔已下載');
 }
 
 function importBackup() {
@@ -1292,10 +1327,15 @@ function importBackup() {
         if (!data.entries || !Array.isArray(data.entries)) {
           toast('檔案格式不正確 ❌'); return;
         }
-        if (!confirm(`確定要還原備份嗎？\n（${data._backupDate ? '備份日期：' + data._backupDate.slice(0,10) : '未知日期'}，${data.entries.length} 筆紀錄）\n\n⚠️ 會覆蓋目前所有資料`)) return;
-        localStorage.setItem('cleaning-v4', JSON.stringify(data));
-        load();
-        toast('還原成功 ✅');
+        if (!confirm(`確定要還原備份嗎？\n（${data._backupDate ? '備份日期：' + data._backupDate.slice(0,10) : '未知日期'}，${data.entries.length} 筆紀錄）\n\n會覆蓋目前所有資料`)) return;
+        entries          = data.entries          || [];
+        vacationLogs     = data.vacationLogs     || [];
+        penaltyPaid      = data.penaltyPaid      || [];
+        monthlyPasses    = data.monthlyPasses    || {};
+        bankCarryForward = data.bankCarryForward || 0;
+        archivedStats    = data.archivedStats    || { zones: 0, weeks: 0, metWeeks: 0 };
+        save(); render();
+        toast('還原成功');
       } catch(err) {
         toast('檔案讀取失敗 ❌');
       }
