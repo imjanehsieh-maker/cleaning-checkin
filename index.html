@@ -370,7 +370,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
           <span style="font-size:12px;color:var(--sage);">到</span>
           <input type="date" class="form-input" id="vacation-end" style="flex:1;">
         </div>
-        <div style="font-size:11px;color:var(--sage);margin-top:6px;">只填開始 = 請 1 天；填起迄 = 連續請假，自動分配到對應週</div>
+        <div style="font-size:11px;color:var(--sage);margin-top:6px;" data-i18n="vacDateNote">只填開始 = 請 1 天；填起迄 = 連續請假，自動分配到對應週</div>
       </div>
       <div class="form-row">
         <label class="form-label" data-i18n="vacReasonLabel">申請原因（選填）</label>
@@ -415,22 +415,22 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <!-- OVERALL STATS -->
     <div class="summary-bar" style="grid-template-columns:1fr 1px 1fr 1px 1fr 1px 1fr;">
       <div class="sb-item">
-        <div class="sb-label">總完成</div>
+        <div class="sb-label" data-i18n="ovTotal">總完成</div>
         <div class="sb-value" id="ov-total">0<span style="font-size:12px;color:rgba(255,255,255,0.35)">區</span></div>
       </div>
       <div class="sb-divider"></div>
       <div class="sb-item">
-        <div class="sb-label">達標率</div>
+        <div class="sb-label" data-i18n="ovRate">達標率</div>
         <div class="sb-value" id="ov-rate">—</div>
       </div>
       <div class="sb-divider"></div>
       <div class="sb-item">
-        <div class="sb-label">連勝</div>
+        <div class="sb-label" data-i18n="ovStreak">連勝</div>
         <div class="sb-value" id="ov-streak">0<span style="font-size:12px;color:rgba(255,255,255,0.35)">週</span></div>
       </div>
       <div class="sb-divider"></div>
       <div class="sb-item">
-        <div class="sb-label">未繳罰款</div>
+        <div class="sb-label" data-i18n="ovUnpaid">未繳罰款</div>
         <div class="sb-value" id="ov-unpaid" style="color:#ffaa80;">$0</div>
       </div>
     </div>
@@ -439,7 +439,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="card" id="ov-unpaid-card" style="display:none;">
       <div class="card-title">
         <div class="card-dot" style="background:#C9847A;"></div>
-        <h2>未繳罰款</h2>
+        <h2 data-i18n="ovUnpaidTitle">未繳罰款</h2>
       </div>
       <div id="ov-unpaid-list"></div>
     </div>
@@ -448,7 +448,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="card">
       <div class="card-title">
         <div class="card-dot"></div>
-        <h2>每週狀態</h2>
+        <h2 data-i18n="ovWeeklyStatus">每週狀態</h2>
         <span class="card-right" id="ov-week-count"></span>
       </div>
       <div id="ov-weeks"></div>
@@ -458,7 +458,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="card">
       <div class="card-title">
         <div class="card-dot"></div>
-        <h2>特休使用紀錄</h2>
+        <h2 data-i18n="ovVacLog">特休使用紀錄</h2>
       </div>
       <div id="ov-vacation"></div>
     </div>
@@ -471,8 +471,8 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
     <div class="order-rule">
       <div class="or-icon">🔒</div>
       <div>
-        <div class="or-title">必須按照順序執行</div>
-        <div class="or-desc">區域依序完成，<strong>不能跳過</strong>。做完 H 後重新從 A 開始循環。</div>
+        <div class="or-title" data-i18n="rulesMustOrder">必須按照順序執行</div>
+        <div class="or-desc" data-i18n="rulesOrderDesc" data-i18n-html="1">區域依序完成，<strong>不能跳過</strong>。做完 H 後重新從 A 開始循環。</div>
         <div class="arrow-flow">
           <span class="af-zone">A</span><span class="af-arr">›</span>
           <span class="af-zone">B</span><span class="af-arr">›</span>
@@ -482,101 +482,101 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
           <span class="af-zone">F</span><span class="af-arr">›</span>
           <span class="af-zone">G</span><span class="af-arr">›</span>
           <span class="af-zone">H</span><span class="af-arr">›</span>
-          <span style="font-size:10px;color:var(--sage);">循環</span>
+          <span style="font-size:10px;color:var(--sage);" data-i18n="rulesCycle">循環</span>
         </div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title"><div class="dot"></div><h2>八大打掃區域</h2><div class="line"></div></div>
+      <div class="section-title"><div class="dot"></div><h2 data-i18n="rulesZonesTitle">八大打掃區域</h2><div class="line"></div></div>
       <div class="zones-grid">
-        <div class="zone-card zone-A"><div class="zone-num">第 1 區</div><div class="zone-letter">A</div><div class="zone-name">一樓公共</div><div class="zone-desc">1樓公共區域</div></div>
-        <div class="zone-card zone-B"><div class="zone-num">第 2 區</div><div class="zone-letter">B</div><div class="zone-name">一樓廁所</div><div class="zone-desc">1樓廁所</div></div>
-        <div class="zone-card zone-C"><div class="zone-num">第 3 區</div><div class="zone-letter">C</div><div class="zone-name">二樓公共＋媽媽房</div><div class="zone-desc">含曬衣區地板＋媽媽房間</div></div>
-        <div class="zone-card zone-D"><div class="zone-num">第 4 區</div><div class="zone-letter">D</div><div class="zone-name">二樓廁所</div><div class="zone-desc">2樓廁所</div></div>
-        <div class="zone-card zone-E"><div class="zone-num">第 5 區</div><div class="zone-letter">E</div><div class="zone-name">三樓公共＋臥房</div><div class="zone-desc">公共＋自己房＋爸爸房</div></div>
-        <div class="zone-card zone-F"><div class="zone-num">第 6 區</div><div class="zone-letter">F</div><div class="zone-name">三樓廁所</div><div class="zone-desc">3樓廁所</div></div>
-        <div class="zone-card zone-G"><div class="zone-num">第 7 區</div><div class="zone-letter">G</div><div class="zone-name">四樓陽台＋鳥房</div><div class="zone-desc">地板清水刷洗＋鳥房間</div></div>
-        <div class="zone-card zone-H"><div class="zone-num">第 8 區</div><div class="zone-letter">H</div><div class="zone-name">廚房</div><div class="zone-desc">整體廚房清潔</div></div>
+        <div class="zone-card zone-A"><div class="zone-num" data-i18n="zNum" data-i18n-arg="1">第 1 區</div><div class="zone-letter">A</div><div class="zone-name" data-i18n="znA">一樓公共</div><div class="zone-desc" data-i18n="zdA">1樓公共區域</div></div>
+        <div class="zone-card zone-B"><div class="zone-num" data-i18n="zNum" data-i18n-arg="2">第 2 區</div><div class="zone-letter">B</div><div class="zone-name" data-i18n="znB">一樓廁所</div><div class="zone-desc" data-i18n="zdB">1樓廁所</div></div>
+        <div class="zone-card zone-C"><div class="zone-num" data-i18n="zNum" data-i18n-arg="3">第 3 區</div><div class="zone-letter">C</div><div class="zone-name" data-i18n="znC">二樓公共＋媽媽房</div><div class="zone-desc" data-i18n="zdC">含曬衣區地板＋媽媽房間</div></div>
+        <div class="zone-card zone-D"><div class="zone-num" data-i18n="zNum" data-i18n-arg="4">第 4 區</div><div class="zone-letter">D</div><div class="zone-name" data-i18n="znD">二樓廁所</div><div class="zone-desc" data-i18n="zdD">2樓廁所</div></div>
+        <div class="zone-card zone-E"><div class="zone-num" data-i18n="zNum" data-i18n-arg="5">第 5 區</div><div class="zone-letter">E</div><div class="zone-name" data-i18n="znE">三樓公共＋臥房</div><div class="zone-desc" data-i18n="zdE">公共＋自己房＋爸爸房</div></div>
+        <div class="zone-card zone-F"><div class="zone-num" data-i18n="zNum" data-i18n-arg="6">第 6 區</div><div class="zone-letter">F</div><div class="zone-name" data-i18n="znF">三樓廁所</div><div class="zone-desc" data-i18n="zdF">3樓廁所</div></div>
+        <div class="zone-card zone-G"><div class="zone-num" data-i18n="zNum" data-i18n-arg="7">第 7 區</div><div class="zone-letter">G</div><div class="zone-name" data-i18n="znG">四樓陽台＋鳥房</div><div class="zone-desc" data-i18n="zdG">地板清水刷洗＋鳥房間</div></div>
+        <div class="zone-card zone-H"><div class="zone-num" data-i18n="zNum" data-i18n-arg="8">第 8 區</div><div class="zone-letter">H</div><div class="zone-name" data-i18n="znH">廚房</div><div class="zone-desc" data-i18n="zdH">整體廚房清潔</div></div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title"><div class="dot"></div><h2>執行規則</h2><div class="line"></div></div>
+      <div class="section-title"><div class="dot"></div><h2 data-i18n="rulesExecTitle">執行規則</h2><div class="line"></div></div>
       <div class="rules-grid">
-        <div class="rule-card"><div class="rule-icon">📋</div><div><div class="rule-label">順序執行</div><div class="rule-value">依 <strong>A→H 順序</strong>逐區完成，進度跨週延續</div></div></div>
-        <div class="rule-card"><div class="rule-icon">⏱️</div><div><div class="rule-label">週目標</div><div class="rule-value">每週完成 <strong>5 個區域</strong>，每區標準 <strong>2 小時</strong></div></div></div>
-        <div class="rule-card"><div class="rule-icon">🙋</div><div><div class="rule-label">機動協助</div><div class="rule-value"><strong>主動詢問</strong>媽媽需要什麼幫忙</div></div></div>
-        <div class="rule-card"><div class="rule-icon">🔁</div><div><div class="rule-label">循環制</div><div class="rule-value">做完 H 後重新從 <strong>A 開始</strong></div></div></div>
+        <div class="rule-card"><div class="rule-icon">📋</div><div><div class="rule-label" data-i18n="rulesSeqLabel">順序執行</div><div class="rule-value" data-i18n="rulesSeqValue" data-i18n-html="1">依 <strong>A→H 順序</strong>逐區完成，進度跨週延續</div></div></div>
+        <div class="rule-card"><div class="rule-icon">⏱️</div><div><div class="rule-label" data-i18n="rulesGoalLabel">週目標</div><div class="rule-value" data-i18n="rulesGoalValue" data-i18n-html="1">每週完成 <strong>5 個區域</strong>，每區標準 <strong>2 小時</strong></div></div></div>
+        <div class="rule-card"><div class="rule-icon">🙋</div><div><div class="rule-label" data-i18n="rulesHelpLabel">機動協助</div><div class="rule-value" data-i18n="rulesHelpValue" data-i18n-html="1"><strong>主動詢問</strong>媽媽需要什麼幫忙</div></div></div>
+        <div class="rule-card"><div class="rule-icon">🔁</div><div><div class="rule-label" data-i18n="rulesCycleLabel">循環制</div><div class="rule-value" data-i18n="rulesCycleValue" data-i18n-html="1">做完 H 後重新從 <strong>A 開始</strong></div></div></div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title"><div class="dot"></div><h2>每日 / 每週固定任務</h2><div class="line"></div></div>
+      <div class="section-title"><div class="dot"></div><h2 data-i18n="rulesDailyTitle">每日 / 每週固定任務</h2><div class="line"></div></div>
       <div class="rules-grid">
-        <div class="rule-card"><div class="rule-icon">🍽️</div><div><div class="rule-label">每天晚上</div><div class="rule-value">收拾廚房食物、<strong>洗碗</strong></div></div></div>
-        <div class="rule-card"><div class="rule-icon">🗑️</div><div><div class="rule-label">每週至少 2 次</div><div class="rule-value">固定<strong>倒垃圾＋回收</strong></div></div></div>
-        <div class="rule-card"><div class="rule-icon">🚗</div><div><div class="rule-label">每月至少 2 次</div><div class="rule-value">開車載水桶去<strong>加水</strong></div></div></div>
+        <div class="rule-card"><div class="rule-icon">🍽️</div><div><div class="rule-label" data-i18n="rulesEveryNight">每天晚上</div><div class="rule-value" data-i18n="rulesDishes" data-i18n-html="1">收拾廚房食物、<strong>洗碗</strong></div></div></div>
+        <div class="rule-card"><div class="rule-icon">🗑️</div><div><div class="rule-label" data-i18n="rulesTwiceWeek">每週至少 2 次</div><div class="rule-value" data-i18n="rulesTrash" data-i18n-html="1">固定<strong>倒垃圾＋回收</strong></div></div></div>
+        <div class="rule-card"><div class="rule-icon">🚗</div><div><div class="rule-label" data-i18n="rulesTwiceMonth">每月至少 2 次</div><div class="rule-value" data-i18n="rulesWater" data-i18n-html="1">開車載水桶去<strong>加水</strong></div></div></div>
       </div>
       <div class="weekly-grid" style="margin-top:10px;">
-        <div class="weekly-card highlight"><div class="weekly-day">每週三</div><div class="weekly-icon">🍳</div><div class="weekly-task">協助煮飯</div></div>
-        <div class="weekly-card highlight"><div class="weekly-day">每週日</div><div class="weekly-icon">🍳</div><div class="weekly-task">協助煮飯</div></div>
-        <div class="weekly-card"><div class="weekly-day">每週日</div><div class="weekly-icon">🐦</div><div class="weekly-task">固定餵鳥</div></div>
+        <div class="weekly-card highlight"><div class="weekly-day" data-i18n="rulesWed">每週三</div><div class="weekly-icon">🍳</div><div class="weekly-task" data-i18n="rulesCook">協助煮飯</div></div>
+        <div class="weekly-card highlight"><div class="weekly-day" data-i18n="rulesSun">每週日</div><div class="weekly-icon">🍳</div><div class="weekly-task" data-i18n="rulesCook">協助煮飯</div></div>
+        <div class="weekly-card"><div class="weekly-day" data-i18n="rulesSun">每週日</div><div class="weekly-icon">🐦</div><div class="weekly-task" data-i18n="rulesFeedBird">固定餵鳥</div></div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title"><div class="dot"></div><h2>未達標罰款</h2><div class="line"></div></div>
+      <div class="section-title"><div class="dot"></div><h2 data-i18n="rulesPenaltyTitle">未達標罰款</h2><div class="line"></div></div>
       <div class="order-rule" style="border-color:#C9847A;background:var(--lr);">
         <div class="or-icon">⚠️</div>
         <div>
-          <div class="or-title" style="color:var(--terra);">未完成當週目標，需繳費給媽媽</div>
-          <div class="or-desc">每少完成 1 區 → 繳交 <strong>500 元</strong><br>例：目標 5 區，完成 3 區 → 繳 <strong>$1,000</strong></div>
+          <div class="or-title" style="color:var(--terra);" data-i18n="rulesPenaltyHead">未完成當週目標，需繳費給媽媽</div>
+          <div class="or-desc" data-i18n="rulesPenaltyDesc" data-i18n-html="1">每少完成 1 區 → 繳交 <strong>500 元</strong><br>例：目標 5 區，完成 3 區 → 繳 <strong>$1,000</strong></div>
         </div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title"><div class="dot"></div><h2>時間銀行制度</h2><div class="line"></div></div>
+      <div class="section-title"><div class="dot"></div><h2 data-i18n="rulesBankTitle">時間銀行制度</h2><div class="line"></div></div>
       <div class="bank-box">
-        <div class="bank-title">🏦 累積滿 2 小時，隨時可兌換特休</div>
+        <div class="bank-title" data-i18n="rulesBankHead">🏦 累積滿 2 小時，隨時可兌換特休</div>
         <div class="bank-grid">
-          <div class="bank-item"><div class="bi-label">如何累積</div><div class="bi-value">每區標準 2hr，<strong>超過才存款</strong><br>花 1–2hr → <strong>不存不扣</strong><br>花 2.5hr → 存入 <strong>+0.5hr</strong></div></div>
-          <div class="bank-item"><div class="bi-label">如何兌換</div><div class="bi-value">累積滿 <strong>+2hr</strong>，<strong>隨時可申請</strong>兌換成特休</div></div>
-          <div class="bank-item"><div class="bi-label">兌換效益</div><div class="bi-value">每 +2hr → 當週目標 -1 區，只需完成 <strong>4 區</strong></div></div>
-          <div class="bank-item"><div class="bi-label">特休用途</div><div class="bi-value">不舒服、旅遊均可動用，<strong>跨月不消失</strong></div></div>
+          <div class="bank-item"><div class="bi-label" data-i18n="rulesBankHow">如何累積</div><div class="bi-value" data-i18n="rulesBankHowVal" data-i18n-html="1">每區標準 2hr，<strong>超過才存款</strong><br>花 1–2hr → <strong>不存不扣</strong><br>花 2.5hr → 存入 <strong>+0.5hr</strong></div></div>
+          <div class="bank-item"><div class="bi-label" data-i18n="rulesBankExchange">如何兌換</div><div class="bi-value" data-i18n="rulesBankExchangeVal" data-i18n-html="1">累積滿 <strong>+2hr</strong>，<strong>隨時可申請</strong>兌換成特休</div></div>
+          <div class="bank-item"><div class="bi-label" data-i18n="rulesBankBenefit">兌換效益</div><div class="bi-value" data-i18n="rulesBankBenefitVal" data-i18n-html="1">每 +2hr → 當週目標 -1 區，只需完成 <strong>4 區</strong></div></div>
+          <div class="bank-item"><div class="bi-label" data-i18n="rulesBankUse">特休用途</div><div class="bi-value" data-i18n="rulesBankUseVal" data-i18n-html="1">不舒服、旅遊均可動用，<strong>跨月不消失</strong></div></div>
         </div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title"><div class="dot"></div><h2>請假制度</h2><div class="line"></div></div>
+      <div class="section-title"><div class="dot"></div><h2 data-i18n="rulesLeaveTitle">請假制度</h2><div class="line"></div></div>
       <div class="leave-box">
         <div class="leave-icon">🏖️</div>
         <div>
-          <div class="leave-title">每月 3 天免扣假</div>
-          <div class="leave-desc">不舒服可直接申請，<strong>不扣特休</strong><br>超過 3 天從特休扣，特休可<strong>跨月累積</strong></div>
+          <div class="leave-title" data-i18n="rulesLeaveHead">每月 3 天免扣假</div>
+          <div class="leave-desc" data-i18n="rulesLeaveDesc" data-i18n-html="1">不舒服可直接申請，<strong>不扣特休</strong><br>超過 3 天從特休扣，特休可<strong>跨月累積</strong></div>
         </div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title"><div class="dot"></div><h2>薪資結構</h2><div class="line"></div></div>
+      <div class="section-title"><div class="dot"></div><h2 data-i18n="rulesSalaryTitle">薪資結構</h2><div class="line"></div></div>
       <div class="salary-box">
         <div>
-          <div class="salary-label">週薪</div>
-          <div class="salary-amount">$2,500</div>
-          <div class="salary-unit">完成每週 5 個區域可領取</div>
+          <div class="salary-label" data-i18n="rulesSalaryLabel">週薪</div>
+          <div class="salary-amount" data-i18n="rulesSalaryAmt">$2,500</div>
+          <div class="salary-unit" data-i18n="rulesSalaryUnit">完成每週 5 個區域可領取</div>
         </div>
         <div class="salary-note">
-          <div class="salary-note-label">月薪合計</div>
-          <div class="salary-note-value">$10,000</div>
-          <div class="salary-note-sub">可抵媽媽每月家用</div>
+          <div class="salary-note-label" data-i18n="rulesSalaryMonthLabel">月薪合計</div>
+          <div class="salary-note-value" data-i18n="rulesSalaryMonthAmt">$10,000</div>
+          <div class="salary-note-sub" data-i18n="rulesSalaryMonthSub">可抵媽媽每月家用</div>
         </div>
       </div>
     </div>
 
-    <div class="rules-footer">一起把家顧好，也把自己顧好 🌱</div>
+    <div class="rules-footer" data-i18n="rulesFooter">一起把家顧好，也把自己顧好 🌱</div>
 
   </div>
 
@@ -857,7 +857,8 @@ function setLang(lang) {
 function applyStaticI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
-    const val = t(key);
+    const arg = el.dataset.i18nArg;
+    const val = arg != null ? t(key, arg) : t(key);
     if (val != null) {
       if (el.dataset.i18nHtml) el.innerHTML = val;
       else el.textContent = val;
