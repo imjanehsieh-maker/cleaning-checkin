@@ -400,6 +400,7 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
       <div style="display:flex;flex-direction:column;gap:8px;">
         <button onclick="exportBackup()" style="width:100%;padding:11px;background:var(--sage);border:none;border-radius:10px;color:white;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">💾 匯出備份</button>
         <button onclick="importBackup()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--sage);border-radius:10px;color:var(--sage);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📂 匯入還原</button>
+        <button onclick="restoreFromCloud()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">☁️ 從雲端備份還原</button>
         <button onclick="archiveOld()" style="width:100%;padding:11px;background:white;border:1.5px solid var(--gold);border-radius:10px;color:var(--brown);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📦 歸檔舊資料（保留近 2 月）</button>
         <button onclick="resetAll()" style="width:100%;padding:11px;background:none;border:1.5px solid #ddd;border-radius:10px;color:#bbb;font-family:'Noto Sans TC',sans-serif;font-size:11px;cursor:pointer;">🗑️ 清空全部資料</button>
       </div>
@@ -641,6 +642,7 @@ function load() {
       localStorage.setItem('cleaning-v4', JSON.stringify(d));
       render();
     }
+    if (!firebaseReady) autoBackup();
     firebaseReady = true;
   });
 }
@@ -651,6 +653,43 @@ function save() {
   localStorage.setItem('cleaning-v4', JSON.stringify(data));
   // 寫入 Firebase（同步到雲端）
   dataRef.set(data).catch(e => console.warn('Firebase save failed:', e));
+}
+
+// ── AUTO BACKUP（每週自動備份，保留 4 週）──
+function autoBackup() {
+  const now = new Date();
+  const weekId = getWeekId(now);
+  const lastBackupWeek = localStorage.getItem('cleaning-last-backup-week');
+  if (lastBackupWeek === weekId) return; // 本週已備份
+  if (!entries.length) return; // 沒資料不備份
+
+  const backupData = {
+    entries, vacationLogs, penaltyPaid, monthlyPasses, bankCarryForward, archivedStats,
+    _backupDate: now.toISOString(),
+    _version: 'v4'
+  };
+
+  const backupsRef = db.ref('backups/' + weekId);
+  backupsRef.set(backupData).then(() => {
+    localStorage.setItem('cleaning-last-backup-week', weekId);
+    // 清理超過 4 週的舊備份
+    db.ref('backups').once('value', (snap) => {
+      const all = snap.val();
+      if (!all) return;
+      const keys = Object.keys(all).sort();
+      while (keys.length > 4) {
+        const old = keys.shift();
+        db.ref('backups/' + old).remove();
+      }
+    });
+  }).catch(e => console.warn('Auto backup failed:', e));
+}
+
+function getWeekId(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  return d.toISOString().slice(0, 10);
 }
 
 // ── HELPERS ────────────────────────────────────────────
@@ -1343,6 +1382,33 @@ function importBackup() {
     reader.readAsText(file);
   };
   input.click();
+}
+
+function restoreFromCloud() {
+  db.ref('backups').once('value', (snap) => {
+    const all = snap.val();
+    if (!all) { toast('沒有雲端備份'); return; }
+    const keys = Object.keys(all).sort().reverse();
+    const options = keys.map((k, i) => {
+      const b = all[k];
+      const date = b._backupDate ? b._backupDate.slice(0, 10) : k;
+      return `${i + 1}. ${date}（${(b.entries || []).length} 筆紀錄）`;
+    }).join('\n');
+    const choice = prompt(`選擇要還原的雲端備份：\n\n${options}\n\n輸入數字（1-${keys.length}）：`);
+    if (!choice) return;
+    const idx = parseInt(choice) - 1;
+    if (idx < 0 || idx >= keys.length) { toast('無效的選擇'); return; }
+    const data = all[keys[idx]];
+    if (!confirm(`確定要還原 ${data._backupDate ? data._backupDate.slice(0, 10) : keys[idx]} 的備份嗎？\n\n會覆蓋目前所有資料`)) return;
+    entries          = data.entries          || [];
+    vacationLogs     = data.vacationLogs     || [];
+    penaltyPaid      = data.penaltyPaid      || [];
+    monthlyPasses    = data.monthlyPasses    || {};
+    bankCarryForward = data.bankCarryForward || 0;
+    archivedStats    = data.archivedStats    || { zones: 0, weeks: 0, metWeeks: 0 };
+    save(); render();
+    toast('已從雲端備份還原');
+  });
 }
 
 // ── UI ─────────────────────────────────────────────────
