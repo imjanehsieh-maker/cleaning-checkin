@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 firebase.initializeApp({
   apiKey: "AIzaSyBNp3dlB-UzkJ1cFZGbLvKr7wY9U1PtVE8",
@@ -17,6 +18,7 @@ firebase.initializeApp({
 });
 const db = firebase.database();
 const dataRef = db.ref('cleaning-v4');
+const auth = firebase.auth();
 </script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -210,6 +212,15 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
 .rules-footer { text-align:center; margin-top:20px; padding-top:12px; border-top:1px dashed var(--warm); font-size:11px; color:var(--sage); letter-spacing:2px; line-height:2; }
 
 /* TOAST */
+/* LOGIN OVERLAY */
+.login-overlay { position:fixed; inset:0; background:var(--cream); z-index:999; display:flex; align-items:center; justify-content:center; padding:24px; }
+.login-box { background:white; border-radius:20px; padding:32px 28px; width:100%; max-width:360px; border:1.5px solid var(--warm); }
+.login-title { font-family:'Noto Serif TC',serif; font-size:22px; font-weight:900; color:var(--brown); text-align:center; letter-spacing:4px; margin-bottom:6px; }
+.login-sub { font-size:12px; color:var(--sage); text-align:center; letter-spacing:2px; margin-bottom:28px; }
+.login-err { font-size:12px; color:var(--terra); text-align:center; margin-bottom:12px; min-height:16px; }
+.login-btn { width:100%; padding:14px; background:var(--terra); border:none; border-radius:12px; color:white; font-family:'Noto Serif TC',serif; font-size:16px; font-weight:700; letter-spacing:3px; cursor:pointer; margin-top:8px; transition:all 0.2s; }
+.login-btn:hover { background:var(--brown); }
+
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--brown); color:white; padding:12px 24px; border-radius:30px; font-size:13px; opacity:0; transition:all 0.3s; pointer-events:none; z-index:999; white-space:nowrap; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
@@ -217,8 +228,26 @@ body { background:var(--cream); font-family:'Noto Sans TC',sans-serif; color:var
 <body>
 <div class="app">
 
+  <div id="login-overlay" class="login-overlay" style="display:none;">
+    <div class="login-box">
+      <div class="login-title">打掃打卡</div>
+      <div class="login-sub">妹妹專屬 · 請先登入</div>
+      <div class="login-err" id="login-err"></div>
+      <div class="form-row">
+        <label class="form-label">📧 Email</label>
+        <input type="email" class="form-input" id="login-email" placeholder="輸入 Email">
+      </div>
+      <div class="form-row">
+        <label class="form-label">🔒 密碼</label>
+        <input type="password" class="form-input" id="login-pw" placeholder="輸入密碼" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="login-btn" onclick="doLogin()">登入</button>
+    </div>
+  </div>
+
   <div class="header" style="position:relative;">
     <button id="lang-toggle" onclick="setLang(LANG==='zh'?'en':'zh')" style="position:absolute;right:0;top:0;background:var(--warm);border:none;border-radius:8px;padding:4px 10px;font-size:11px;color:var(--brown);cursor:pointer;font-weight:600;">🌐 EN</button>
+    <button id="logout-btn" onclick="doLogout()" style="display:none;position:absolute;left:0;top:0;background:var(--warm);border:none;border-radius:8px;padding:4px 10px;font-size:11px;color:var(--brown);cursor:pointer;font-weight:600;">登出</button>
     <h1 data-i18n="title">打掃打卡系統</h1>
     <p data-i18n="subtitle">妹妹專屬 · 每日記錄</p>
   </div>
@@ -1737,12 +1766,42 @@ function setToday() {
   if (g('input-date')) g('input-date').value = v;
 }
 
+// ── AUTH ───────────────────────────────────────────────
+function showLoginOverlay() { document.getElementById('login-overlay').style.display = 'flex'; }
+function hideLoginOverlay() { document.getElementById('login-overlay').style.display = 'none'; }
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  document.getElementById('login-err').textContent = '';
+  auth.signInWithEmailAndPassword(email, pw).catch(() => {
+    document.getElementById('login-err').textContent = '帳號或密碼錯誤，請重試';
+  });
+}
+
+function doLogout() {
+  auth.signOut();
+}
+
 // ── INIT ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   applyStaticI18n();
   applyRole();
   setToday();
   load();
+
+  if (ROLE === 'user') {
+    showLoginOverlay(); // 先蓋住，等 auth 確認
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        hideLoginOverlay();
+        document.getElementById('logout-btn').style.display = '';
+      } else {
+        showLoginOverlay();
+        document.getElementById('logout-btn').style.display = 'none';
+      }
+    });
+  }
 });
 
 function applyRole() {
